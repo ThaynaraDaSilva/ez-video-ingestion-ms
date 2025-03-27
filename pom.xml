@@ -10,9 +10,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>duosilva-tech-solutions</groupId>
-	<artifactId>ez-frame-video-injestion-ms</artifactId>
+	<artifactId>ez-video-injestion-ms</artifactId>
 	<version>1.0.0-RELEASE</version>
-	<name>ez-frame-video-injestion-ms</name>
+	<name>ez-video-injestion-ms</name>
 	<description>br.duosilva.tech.solutions</description>
 	<url />
 	<licenses>

@@ -12,7 +12,7 @@ import br.duosilva.tech.solutions.ez.frame.generator.ms.application.usecases.Upl
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController()
-@RequestMapping("/v1/ms/frame-video-ingestion")
+@RequestMapping("/v1/ms/video-ingestion")
 @Tag(name = "Frame Video Ingestion Microsservice", description = "Microsserviço responsável por gerenciar os vídeos fornecidos por usuários para processamento.")
 public class VideoIngestionController {
 

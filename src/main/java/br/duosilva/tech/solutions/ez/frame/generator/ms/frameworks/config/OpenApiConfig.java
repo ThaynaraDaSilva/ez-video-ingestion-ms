@@ -17,10 +17,10 @@ public class OpenApiConfig {
 	@Bean
 	OpenAPI customConfiguration() {
 		return new OpenAPI().components(new Components())
-				.info(new Info().title("ez-frame-video-ingestion-ms").description("DuoSilva Tech Solutions")
+				.info(new Info().title("ez-video-ingestion-ms").description("DuoSilva Tech Solutions")
 						.version("1.0.0-RELEASE")
-						.license(new License().name("Apache License").url("https://github.com/ThaynaraDaSilva/ez-frame-video-ingestion-ms"))
-						.termsOfService("https://github.com/ThaynaraDaSilva/ez-frame-video-ingestion-ms"))
+						.license(new License().name("Apache License").url("https://github.com/ThaynaraDaSilva/ez-video-ingestion-ms"))
+						.termsOfService("https://github.com/ThaynaraDaSilva/ez-video-ingestion-ms"))
 				.addSecurityItem(new SecurityRequirement()
 						.addList("Bearer Authentication"))
 				.components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()));
