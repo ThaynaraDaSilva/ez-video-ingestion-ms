@@ -1,4 +1,4 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.domain.policy;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.policy;
 
 import org.springframework.stereotype.Component;
 

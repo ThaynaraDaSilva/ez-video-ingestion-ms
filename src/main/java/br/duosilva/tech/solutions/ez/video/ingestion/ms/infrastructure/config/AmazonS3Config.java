@@ -1,4 +1,4 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.infrastructure.config;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.config;
 
 import java.net.URI;
 

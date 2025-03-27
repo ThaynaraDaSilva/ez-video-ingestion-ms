@@ -1,4 +1,4 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.domain.model;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model;
 
 /**
  * 

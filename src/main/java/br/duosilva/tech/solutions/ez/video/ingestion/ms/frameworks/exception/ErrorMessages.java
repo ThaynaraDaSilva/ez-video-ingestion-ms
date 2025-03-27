@@ -1,4 +1,4 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.frameworks.exception;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception;
 
 public class ErrorMessages {
 

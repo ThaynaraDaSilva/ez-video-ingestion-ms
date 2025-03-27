@@ -1,13 +1,13 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.domain.service;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.service;
 
 import java.util.Arrays;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.duosilva.tech.solutions.ez.frame.generator.ms.domain.policy.VideoUploadPolicy;
-import br.duosilva.tech.solutions.ez.frame.generator.ms.frameworks.exception.BusinessRuleException;
-import br.duosilva.tech.solutions.ez.frame.generator.ms.frameworks.exception.ErrorMessages;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.policy.VideoUploadPolicy;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.ErrorMessages;
 
 @Service
 public class VideoUploadPolicyService {

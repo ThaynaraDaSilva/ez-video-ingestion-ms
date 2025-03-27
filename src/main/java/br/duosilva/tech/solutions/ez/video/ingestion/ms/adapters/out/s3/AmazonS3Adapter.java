@@ -1,18 +1,18 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.adapters.out.s3;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3;
 
 import java.io.File;
 import java.time.Duration;
 
 import org.springframework.stereotype.Component;
 
-import br.duosilva.tech.solutions.ez.frame.generator.ms.infrastructure.config.AmazonProperties;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.config.AmazonProperties;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Component
 public class AmazonS3Adapter {

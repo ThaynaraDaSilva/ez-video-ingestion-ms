@@ -1,4 +1,4 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

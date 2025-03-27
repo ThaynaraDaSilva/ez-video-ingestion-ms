@@ -1,4 +1,4 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.frameworks.exception;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,10 +1,9 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.infrastructure.zip;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.zip;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -12,7 +11,7 @@ import java.util.zip.ZipOutputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import br.duosilva.tech.solutions.ez.frame.generator.ms.frameworks.exception.BusinessRuleException;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
 
 @Component
 public class ZipFileGenerator {

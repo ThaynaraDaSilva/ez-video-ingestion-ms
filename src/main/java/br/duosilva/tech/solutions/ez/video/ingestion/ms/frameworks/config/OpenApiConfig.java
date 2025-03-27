@@ -1,4 +1,4 @@
-package br.duosilva.tech.solutions.ez.frame.generator.ms.frameworks.config;
+package br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
