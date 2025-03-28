@@ -1,15 +1,11 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases;
 
-import java.time.Duration;
 import java.util.UUID;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.messaging.AmazonSQSAdapter;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3.AmazonS3Adapter;
@@ -18,7 +14,7 @@ import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.service.VideoUplo
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.ErrorMessages;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.s3.S3KeyGenerator;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.util.DurationUtils;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.util.DateTimeUtils;
 
 /**
  * Use case responsável por orquestrar o processo de upload e processamento de
@@ -101,7 +97,7 @@ public class VideoIngestionUseCase {
 			message.setOriginalFileName(file.getOriginalFilename());
 			message.setS3Bucket(amazonS3Adapter.getBucketName());
 			message.setS3Key(s3Key);
-			message.setUploadTimestamp(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).toString());
+			message.setUploadTimestamp(DateTimeUtils.getCurrentUtcTimestamp());
 			message.setUserId(userId);
 
 			amazonSQSAdapter.publishVideoIngestionMessage(message);
@@ -112,7 +108,7 @@ public class VideoIngestionUseCase {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
 			LOGGER.info("#### VIDEO PROCESSING COMPLETED: {} ####", file.getOriginalFilename());
-			LOGGER.info("#### TOTAL PROCESSING TIME: {} ####", DurationUtils.formatDuration(duration));
+			LOGGER.info("#### TOTAL PROCESSING TIME: {} ####", DateTimeUtils.formatDuration(duration));
 		}
 	}
 
