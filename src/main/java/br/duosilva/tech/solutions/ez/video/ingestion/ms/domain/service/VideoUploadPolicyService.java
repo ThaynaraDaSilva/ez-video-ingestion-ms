@@ -25,7 +25,7 @@ public class VideoUploadPolicyService {
 	}
 
 	public void validateUserDailyUploadLimit(String userId) {
-		int uploadsToday = 1; // Placeholder — depois será puxado do repositório
+		int uploadsToday = 2; // Placeholder — depois será puxado do repositório
 
 		if (uploadsToday >= uploadPolicy.getMaxUploadsPerDay()) {
 			throw new BusinessRuleException(ErrorMessages.UPLOAD_LIMIT_EXCEEDED_FREE_PLAN);

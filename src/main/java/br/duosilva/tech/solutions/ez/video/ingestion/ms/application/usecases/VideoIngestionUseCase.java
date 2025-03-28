@@ -94,7 +94,7 @@ public class VideoIngestionUseCase {
 			LOGGER.info("#### PRESIGNED URL VALID FOR {} MINUTES ####",  Duration.ofMinutes(15));
 
 		} catch (Exception e) {
-			throw new BusinessRuleException("Failed to process video: " + e);
+			throw new BusinessRuleException("FAILED TO PROCESS VIDEO: " + e);
 		} finally {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;

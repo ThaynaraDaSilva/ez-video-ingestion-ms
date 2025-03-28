@@ -33,19 +33,9 @@ public class AmazonS3Adapter {
 	 * Uploads a .zip file to the configured S3 bucket.
 	 *
 	 * @param key     the object key (ex: userId/filename.zip)
-	 * @param zipFile the zip file to upload
+	 * @param multipartFile the file (video) to upload
 	 */
-	/*
-	 * public void uploadFileToS3(String key, File zipFile) { String bucketName =
-	 * properties.getS3().getBucketName();
-	 * 
-	 * PutObjectRequest request =
-	 * PutObjectRequest.builder().bucket(bucketName).key(key).contentType(
-	 * "application/zip") .build();
-	 * 
-	 * s3Client.putObject(request, RequestBody.fromFile(zipFile.toPath())); }
-	 */
-	
+
 	public void uploadFileToS3(String key, MultipartFile multipartFile) {
 	    String bucketName = properties.getS3().getBucketName();
 
@@ -76,7 +66,7 @@ public class AmazonS3Adapter {
 	}
 
 	/**
-	 * Checks if the zip file already exists in the bucket.
+	 * Checks if file already exists in the bucket.
 	 *
 	 * @param key object key
 	 * @return true if object exists
