@@ -1,9 +1,11 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.config.AmazonProperties;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -31,15 +33,23 @@ public class AmazonS3Adapter {
 	 * Uploads a .zip file to the configured S3 bucket.
 	 *
 	 * @param key     the object key (ex: userId/filename.zip)
-	 * @param zipFile the zip file to upload
+	 * @param multipartFile the file (video) to upload
 	 */
-	public void uploadZipToS3(String key, File zipFile) {
-		String bucketName = properties.getS3().getBucketName();
 
-		PutObjectRequest request = PutObjectRequest.builder().bucket(bucketName).key(key).contentType("application/zip")
-				.build();
+	public void uploadFileToS3(String key, MultipartFile multipartFile) {
+	    String bucketName = properties.getS3().getBucketName();
 
-		s3Client.putObject(request, RequestBody.fromFile(zipFile.toPath()));
+	    try {
+	        PutObjectRequest request = PutObjectRequest.builder()
+	                .bucket(bucketName)
+	                .key(key)
+	                .contentType(multipartFile.getContentType())
+	                .build();
+
+	        s3Client.putObject(request, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
+	    } catch (IOException e) {
+	        throw new RuntimeException("Failed to upload file to S3", e);
+	    }
 	}
 
 	public String generatePresignedUrl(String objectKey, Duration expiration) {
@@ -56,12 +66,12 @@ public class AmazonS3Adapter {
 	}
 
 	/**
-	 * Checks if the zip file already exists in the bucket.
+	 * Checks if file already exists in the bucket.
 	 *
 	 * @param key object key
 	 * @return true if object exists
 	 */
-	public boolean doesZipExistInS3(String key) {
+	public boolean doesFileExistInS3(String key) {
 		String bucketName = properties.getS3().getBucketName();
 		return s3Client.listObjectsV2(builder -> builder.bucket(bucketName).prefix(key)).contents().stream()
 				.anyMatch(obj -> obj.key().equals(key));

@@ -1,6 +1,7 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,8 @@ import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3.AmazonS3
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.service.VideoUploadPolicyService;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.ErrorMessages;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.s3.S3KeyGenerator;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.util.DurationUtils;
 
 /**
  * Use case responsável por orquestrar o processo de upload e processamento de
@@ -19,14 +22,14 @@ import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.Err
  */
 
 @Component
-public class UploadVideoUseCase {
+public class VideoIngestionUseCase {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UploadVideoUseCase.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(VideoIngestionUseCase.class);
 
 	private final VideoUploadPolicyService videoUploadPolicyService;
 	private final AmazonS3Adapter amazonS3Adapter;
 
-	public UploadVideoUseCase(VideoUploadPolicyService videoUploadPolicyService, AmazonS3Adapter amazonS3Adapter) {
+	public VideoIngestionUseCase(VideoUploadPolicyService videoUploadPolicyService, AmazonS3Adapter amazonS3Adapter) {
 	
 		this.videoUploadPolicyService = videoUploadPolicyService;
 		this.amazonS3Adapter = amazonS3Adapter;
@@ -42,7 +45,7 @@ public class UploadVideoUseCase {
 	 * @throws BusinessRuleException se não houver vídeos ou se alguma regra de
 	 *                               negócio for violada
 	 */
-	public void processUploadedVideo(MultipartFile[] multipartFiles, String userId) {
+	public void ingestVideo(MultipartFile[] multipartFiles, String userId) {
 
 		this.validateFilesPresence(multipartFiles);
 
@@ -52,7 +55,7 @@ public class UploadVideoUseCase {
 			if (file.isEmpty())
 				continue;
 
-			this.processFile(file, userId);
+			this.ingestSingleVideoFile(file, userId);
 		}
 
 	}
@@ -63,7 +66,7 @@ public class UploadVideoUseCase {
 		}
 	}
 
-	private void processFile(MultipartFile file, String userId) {
+	private void ingestSingleVideoFile(MultipartFile file, String userId) {
 		long startTime = System.currentTimeMillis();
 		LOGGER.info("############################################################");
 		LOGGER.info("#### VIDEO PROCESSING STARTED: {} ####", file.getOriginalFilename());
@@ -71,37 +74,35 @@ public class UploadVideoUseCase {
 		videoUploadPolicyService.validateFileSize(file);
 
 		try {
-			/*File zipFile = videoProcessingService.generateFrames(file);
-			String s3ObjectKey = userId + "/" + zipFile.getName();
+			
+			// 1. Gera o videoId
+		    String videoId = UUID.randomUUID().toString();
+		    
+		    // 2. Gera a chave S3 com base no userId, videoId e extensão
+		    String s3Key = S3KeyGenerator.generateS3Key(userId, file, videoId);
+		   
 
-			if (amazonS3Adapter.doesZipExistInS3(s3ObjectKey)) {
-				LOGGER.warn("#### ZIP ALREADY EXISTS IN S3: {} — SKIPPING UPLOAD ####", s3ObjectKey);
+			if (amazonS3Adapter.doesFileExistInS3(s3Key)) {
+				LOGGER.warn("#### FILE ALREADY EXISTS IN S3: {} — SKIPPING UPLOAD ####", s3Key);
 			} else {
-				amazonS3Adapter.uploadZipToS3(s3ObjectKey, zipFile);
-				LOGGER.info("#### ZIP UPLOADED TO S3: {} ####", s3ObjectKey);
+				amazonS3Adapter.uploadFileToS3(s3Key, file);
+				LOGGER.info("#### FILE UPLOADED TO S3: {} ####", s3Key);
 			}
 
-			String presignedUrl = amazonS3Adapter.generatePresignedUrl(s3ObjectKey, Duration.ofMinutes(15));
-			LOGGER.info("#### PRESIGNED URL (VALID FOR 15 MINUTES): {} ####", presignedUrl);*/
+			String presignedUrl = amazonS3Adapter.generatePresignedUrl(s3Key, Duration.ofMinutes(15));
+			LOGGER.info("#### PRESIGNED URL: {} ####", presignedUrl);
+			LOGGER.info("#### PRESIGNED URL VALID FOR {} MINUTES ####",  Duration.ofMinutes(15));
 
 		} catch (Exception e) {
-			throw new BusinessRuleException("Failed to process video: " + e.getMessage());
+			throw new BusinessRuleException("FAILED TO PROCESS VIDEO: " + e);
 		} finally {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
 			LOGGER.info("#### VIDEO PROCESSING COMPLETED: {} ####", file.getOriginalFilename());
-			LOGGER.info("#### TOTAL PROCESSING TIME: {} ####", formatDuration(duration));
+			LOGGER.info("#### TOTAL PROCESSING TIME: {} ####", DurationUtils.formatDuration(duration));
 		}
 	}
 
-	private String formatDuration(long millis) {
-		Duration duration = Duration.ofMillis(millis);
-		long hours = duration.toHours();
-		long minutes = duration.toMinutesPart();
-		long seconds = duration.toSecondsPart();
-		long milliseconds = duration.toMillisPart();
-
-		return String.format("%02dh %02dm %02ds %03dms", hours, minutes, seconds, milliseconds);
-	}
+	
 
 }
