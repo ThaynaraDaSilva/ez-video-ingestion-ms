@@ -2,13 +2,18 @@ package br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases;
 
 import java.time.Duration;
 import java.util.UUID;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.messaging.AmazonSQSAdapter;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3.AmazonS3Adapter;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoIngestionMessage;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.service.VideoUploadPolicyService;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.ErrorMessages;
@@ -28,11 +33,14 @@ public class VideoIngestionUseCase {
 
 	private final VideoUploadPolicyService videoUploadPolicyService;
 	private final AmazonS3Adapter amazonS3Adapter;
+	private final AmazonSQSAdapter amazonSQSAdapter;
 
-	public VideoIngestionUseCase(VideoUploadPolicyService videoUploadPolicyService, AmazonS3Adapter amazonS3Adapter) {
-	
+	public VideoIngestionUseCase(VideoUploadPolicyService videoUploadPolicyService, AmazonS3Adapter amazonS3Adapter,
+			AmazonSQSAdapter amazonSQSAdapter) {
+
 		this.videoUploadPolicyService = videoUploadPolicyService;
 		this.amazonS3Adapter = amazonS3Adapter;
+		this.amazonSQSAdapter = amazonSQSAdapter;
 	}
 
 	/**
@@ -74,13 +82,12 @@ public class VideoIngestionUseCase {
 		videoUploadPolicyService.validateFileSize(file);
 
 		try {
-			
+
 			// 1. Gera o videoId
-		    String videoId = UUID.randomUUID().toString();
-		    
-		    // 2. Gera a chave S3 com base no userId, videoId e extensão
-		    String s3Key = S3KeyGenerator.generateS3Key(userId, file, videoId);
-		   
+			String videoId = UUID.randomUUID().toString();
+
+			// 2. Gera a chave S3 com base no userId, videoId e extensao
+			String s3Key = S3KeyGenerator.generateS3Key(userId, file, videoId);
 
 			if (amazonS3Adapter.doesFileExistInS3(s3Key)) {
 				LOGGER.warn("#### FILE ALREADY EXISTS IN S3: {} — SKIPPING UPLOAD ####", s3Key);
@@ -88,10 +95,16 @@ public class VideoIngestionUseCase {
 				amazonS3Adapter.uploadFileToS3(s3Key, file);
 				LOGGER.info("#### FILE UPLOADED TO S3: {} ####", s3Key);
 			}
+			// 3. Enviar mensagem para a fila apos o upload
+			VideoIngestionMessage message = new VideoIngestionMessage();
+			message.setVideoId(videoId);
+			message.setOriginalFileName(file.getOriginalFilename());
+			message.setS3Bucket(amazonS3Adapter.getBucketName());
+			message.setS3Key(s3Key);
+			message.setUploadTimestamp(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).toString());
+			message.setUserId(userId);
 
-			String presignedUrl = amazonS3Adapter.generatePresignedUrl(s3Key, Duration.ofMinutes(15));
-			LOGGER.info("#### PRESIGNED URL: {} ####", presignedUrl);
-			LOGGER.info("#### PRESIGNED URL VALID FOR {} MINUTES ####",  Duration.ofMinutes(15));
+			amazonSQSAdapter.publishVideoIngestionMessage(message);
 
 		} catch (Exception e) {
 			throw new BusinessRuleException("FAILED TO PROCESS VIDEO: " + e);
@@ -102,7 +115,5 @@ public class VideoIngestionUseCase {
 			LOGGER.info("#### TOTAL PROCESSING TIME: {} ####", DurationUtils.formatDuration(duration));
 		}
 	}
-
-	
 
 }

@@ -10,9 +10,11 @@ import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.config.Am
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Component;
 import org.springframework.retry.annotation.Backoff;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+@Component
 public class AmazonSQSAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AmazonSQSAdapter.class);

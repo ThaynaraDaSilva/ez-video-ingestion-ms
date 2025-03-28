@@ -1,6 +1,5 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
@@ -75,6 +74,10 @@ public class AmazonS3Adapter {
 		String bucketName = properties.getS3().getBucketName();
 		return s3Client.listObjectsV2(builder -> builder.bucket(bucketName).prefix(key)).contents().stream()
 				.anyMatch(obj -> obj.key().equals(key));
+	}
+	
+	public String getBucketName() {
+	    return properties.getS3().getBucketName();
 	}
 
 }

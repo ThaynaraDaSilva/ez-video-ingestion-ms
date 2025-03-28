@@ -117,5 +117,7 @@ public class AmazonProperties {
 	public void setSqs(Sqs sqs) {
 		this.sqs = sqs;
 	}
+	
+	
 
 }
