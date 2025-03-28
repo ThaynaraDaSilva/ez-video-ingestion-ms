@@ -8,6 +8,8 @@ public class VideoIngestionMessage {
 	private String s3Key;
 	private String uploadTimestamp;
 	private String userId;
+	
+	
 	public String getVideoId() {
 		return videoId;
 	}

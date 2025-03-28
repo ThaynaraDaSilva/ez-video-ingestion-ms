@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController()
 @RequestMapping("/v1/ms/video-ingestion")
-@Tag(name = "Frame Video Ingestion Microsservice", description = "Microsserviço responsável por gerenciar os vídeos fornecidos por usuários para processamento.")
+@Tag(name = "Video Ingestion Microsservice", description = "Microsserviço responsável por gerenciar os vídeos fornecidos por usuários para processamento.")
 public class VideoIngestionController {
 
 	private static final String USER_ID = "6c0dc669-a18e-40d1-93ea-ba328a8daaed";
