@@ -4,13 +4,13 @@ export AWS_DEFAULT_REGION=us-east-1
 
 ```
 create bucket (make bucket - mb)
-aws --endpoint-url=http://localhost:4566 s3 mb s3://ez-frame-generator-zips
+aws --endpoint-url=http://localhost:4566 s3 mb s3://ez-frame-video-storage
 
 ```
 
 ```
 delete bucket (remove bucket - rb)
-aws --endpoint-url=http://localhost:4566 s3 rb s3://ez-frame-generator-zips --force
+aws --endpoint-url=http://localhost:4566 s3 rb s3://ez-frame-video-storage --force
 
 ```
 

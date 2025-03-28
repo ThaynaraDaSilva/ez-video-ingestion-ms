@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases.UploadVideoUseCase;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases.VideoIngestionUseCase;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController()
@@ -18,17 +18,17 @@ public class VideoIngestionController {
 
 	private static final String USER_ID = "6c0dc669-a18e-40d1-93ea-ba328a8daaed";
 
-	private UploadVideoUseCase uploadVideoUseCase;
+	private VideoIngestionUseCase videoIngestionUseCase;
 
-	public VideoIngestionController(UploadVideoUseCase uploadVideoUseCase) {
+	public VideoIngestionController(VideoIngestionUseCase videoIngestionUseCase) {
 		super();
-		this.uploadVideoUseCase = uploadVideoUseCase;
+		this.videoIngestionUseCase = videoIngestionUseCase;
 	}
 
 	@PostMapping(value = "/upload-video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Void> uploadVideo(@RequestPart("files") MultipartFile[] multipartFiles) {
 
-		uploadVideoUseCase.processUploadedVideo(multipartFiles, USER_ID);
+		videoIngestionUseCase.ingestVideo(multipartFiles, USER_ID);
 		return ResponseEntity.accepted().build();
 
 	}
