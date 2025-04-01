@@ -27,7 +27,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
   build-and-test:
-    needs: setup-java
+    needs: setup-environment-tools
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
