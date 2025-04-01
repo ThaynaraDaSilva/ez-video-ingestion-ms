@@ -32,3 +32,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### .dockerignore ###
+target/
+.git/
+.idea/
+*.iml
+*.log
+

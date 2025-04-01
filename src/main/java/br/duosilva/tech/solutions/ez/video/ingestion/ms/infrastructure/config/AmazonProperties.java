@@ -11,6 +11,7 @@ public class AmazonProperties {
 	private Credentials credentials;
 	private S3 s3;
 	private Sqs sqs;
+	private DynamoDb dynamodb;
 
 	public static class Credentials {
 		private String accessKey;
@@ -86,6 +87,26 @@ public class AmazonProperties {
 		}
 	}
 
+	public static class DynamoDb {
+		private String tableName;
+		private String endpoint;
+		
+		public String getTableName() {
+			return tableName;
+		}
+		public void setTableName(String tableName) {
+			this.tableName = tableName;
+		}
+		public String getEndpoint() {
+			return endpoint;
+		}
+		public void setEndpoint(String endpoint) {
+			this.endpoint = endpoint;
+		}
+		
+		
+	}
+
 	public String getRegion() {
 		return region;
 	}
@@ -116,6 +137,14 @@ public class AmazonProperties {
 
 	public void setSqs(Sqs sqs) {
 		this.sqs = sqs;
+	}
+
+	public DynamoDb getDynamodb() {
+		return dynamodb;
+	}
+
+	public void setDynamodb(DynamoDb dynamodb) {
+		this.dynamodb = dynamodb;
 	}
 	
 	

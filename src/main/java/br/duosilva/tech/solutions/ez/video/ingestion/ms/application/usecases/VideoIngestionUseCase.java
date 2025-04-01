@@ -10,6 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.messaging.AmazonSQSAdapter;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3.AmazonS3Adapter;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoIngestionMessage;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingStatus;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.VideoMetadata;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.repository.VideoMetadataRepository;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.service.VideoUploadPolicyService;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.ErrorMessages;
@@ -30,13 +33,15 @@ public class VideoIngestionUseCase {
 	private final VideoUploadPolicyService videoUploadPolicyService;
 	private final AmazonS3Adapter amazonS3Adapter;
 	private final AmazonSQSAdapter amazonSQSAdapter;
+	private final VideoMetadataRepository videoMetadataRepository;
 
 	public VideoIngestionUseCase(VideoUploadPolicyService videoUploadPolicyService, AmazonS3Adapter amazonS3Adapter,
-			AmazonSQSAdapter amazonSQSAdapter) {
+			AmazonSQSAdapter amazonSQSAdapter, VideoMetadataRepository videoMetadataRepository) {
 
 		this.videoUploadPolicyService = videoUploadPolicyService;
 		this.amazonS3Adapter = amazonS3Adapter;
 		this.amazonSQSAdapter = amazonSQSAdapter;
+		this.videoMetadataRepository = videoMetadataRepository;
 	}
 
 	/**
@@ -91,6 +96,24 @@ public class VideoIngestionUseCase {
 				amazonS3Adapter.uploadFileToS3(s3Key, file);
 				LOGGER.info("#### FILE UPLOADED TO S3: {} ####", s3Key);
 			}
+			
+			VideoMetadata metadata = new VideoMetadata(
+				    videoId,
+				    file.getOriginalFilename(),
+				    file.getContentType(),
+				    file.getSize(),
+				    null, // videoDuration ainda será calculado no processamento
+				    userId,
+				    null, // userEmail — você ainda não tem no fluxo atual, pode deixar null
+				    ProcessingStatus.PROCESSING,
+				    null, // errorMessage
+				    null, // resultBucketName
+				    null, // resultObjectKey
+				    null  // processedAt
+				);
+
+				videoMetadataRepository.save(metadata);
+				LOGGER.info("#### VIDEO METADATA PERSISTED FOR VIDEO ID: {} ####", videoId);
 			// 3. Enviar mensagem para a fila apos o upload
 			VideoIngestionMessage message = new VideoIngestionMessage();
 			message.setVideoId(videoId);

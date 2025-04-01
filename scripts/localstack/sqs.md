@@ -7,6 +7,8 @@ create queue
 
 awslocal --endpoint-url=https://localhost.localstack.cloud:4566 sqs create-queue --queue-name video-processing-queue --region us-east-1 --attributes file://C:\THAYNARA_DEV\workspaces\ez-video-ingestion-ms\scripts\localstack\sqs-attributes.json
 
+aws--endpoint-url=https://localhost.localstack.cloud:4566 sqs create-queue --queue-name video-processing-queue --region us-east-1 --attributes file://C:\THAYNARA_DEV\workspaces\ez-video-ingestion-ms\scripts\localstack\sqs-attributes.json
+
 
 ```
 
