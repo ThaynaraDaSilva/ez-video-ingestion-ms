@@ -1,11 +1,10 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.in.controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases.VideoIngestionUseCase;
@@ -26,7 +25,18 @@ public class VideoIngestionController {
 	}
 
 	@PostMapping(value = "/upload-video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<Void> uploadVideo(@RequestPart("files") MultipartFile[] multipartFiles) {
+	public ResponseEntity<Void> uploadVideo(
+			@RequestPart("files") MultipartFile[] multipartFiles,
+			@RequestHeader("Authorization") String authorizationHeader
+	) {
+
+		String token = authorizationHeader.replace("Bearer ", "");
+		DecodedJWT decodedJWT = JWT.decode(token);
+		String userId = decodedJWT.getSubject();
+		String email = decodedJWT.getClaim("email").asString();
+
+		System.out.println("User ID (sub): " + userId);
+		System.out.println("Email: " + email);
 
 		videoIngestionUseCase.ingestVideo(multipartFiles, USER_ID);
 		return ResponseEntity.accepted().build();
