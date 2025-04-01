@@ -44,7 +44,7 @@ public class VideoMetadata {
 	}
 
 	public void markAsProcessing() {
-		this.status = ProcessingStatus.PROCESSING;
+		this.status = ProcessingStatus.PENDING;
 	}
 
 	public void markAsCompleted(String resultBucketName, String resultObjectKey) {

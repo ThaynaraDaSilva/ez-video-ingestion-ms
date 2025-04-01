@@ -16,15 +16,15 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
 @Component
-public class DynamoDBVideoMetadataAdapter implements VideoMetadataRepository {
+public class AmazonDynamoDBAdapter implements VideoMetadataRepository {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(DynamoDBVideoMetadataAdapter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AmazonDynamoDBAdapter.class);
 
 	private final DynamoDbClient dynamoDbClient;
 	private final AmazonProperties amazonProperties;
 	
 
-	public DynamoDBVideoMetadataAdapter(DynamoDbClient dynamoDbClient, AmazonProperties amazonProperties) {
+	public AmazonDynamoDBAdapter(DynamoDbClient dynamoDbClient, AmazonProperties amazonProperties) {
 		this.dynamoDbClient = dynamoDbClient;
 		this.amazonProperties = amazonProperties;
 	}
