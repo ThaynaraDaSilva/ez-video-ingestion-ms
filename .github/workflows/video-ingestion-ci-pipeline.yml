@@ -5,12 +5,11 @@ on:
     branches:
       - develop
       - main
-      - feature/create-ci-pipeline
 env:
   
   #SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
   #SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #EKS_CLUSTER_NAME: 'ez-fastfood-cluster-dev'
+  #EKS_CLUSTER_NAME: 'ez-frame-generator-cluster-dev'
   JAVA_VERSION: '21'
   DOCKER_IMAGE_NAME: 'dasilvathaynara/ez-video-ingestion-ms'
   DOCKER_TAG_LATEST: 'latest'
