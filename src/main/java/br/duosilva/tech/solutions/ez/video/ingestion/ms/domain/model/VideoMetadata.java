@@ -1,7 +1,7 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 public class VideoMetadata {
 
@@ -33,7 +33,7 @@ public class VideoMetadata {
 		this.contentType = contentType;
 		this.fileSizeBytes = fileSizeBytes;
 		this.videoDuration = videoDuration;
-		this.uploadedAt = LocalDateTime.now(ZoneOffset.UTC);
+		this.uploadedAt = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 		this.userId = userId;
 		this.userEmail = userEmail;
 		this.status = status;
