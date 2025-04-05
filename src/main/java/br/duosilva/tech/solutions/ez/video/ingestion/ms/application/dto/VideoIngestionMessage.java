@@ -4,10 +4,11 @@ public class VideoIngestionMessage {
 
 	private String videoId;
 	private String originalFileName;
-	private String s3Bucket;
+	private String s3BucketName;
 	private String s3Key;
 	private String uploadTimestamp;
 	private String userId;
+	private String userEmail;
 
 	public String getVideoId() {
 		return videoId;
@@ -25,12 +26,12 @@ public class VideoIngestionMessage {
 		this.originalFileName = originalFileName;
 	}
 
-	public String getS3Bucket() {
-		return s3Bucket;
+	public String getS3BucketName() {
+		return s3BucketName;
 	}
 
-	public void setS3Bucket(String s3Bucket) {
-		this.s3Bucket = s3Bucket;
+	public void setS3BucketName(String s3BucketName) {
+		this.s3BucketName = s3BucketName;
 	}
 
 	public String getS3Key() {
@@ -57,11 +58,21 @@ public class VideoIngestionMessage {
 		this.userId = userId;
 	}
 
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+
 	@Override
 	public String toString() {
-		return "VideoIngestionMessage{" + "videoId='" + videoId + '\'' + ", originalFileName='" + originalFileName
-				+ '\'' + ", s3Bucket='" + s3Bucket + '\'' + ", s3Key='" + s3Key + '\'' + ", uploadTimestamp='"
-				+ uploadTimestamp + '\'' + ", userId='" + userId + '\'' + '}';
+		return "VideoIngestionMessage [videoId=" + videoId + ", originalFileName=" + originalFileName
+				+ ", s3BucketName=" + s3BucketName + ", s3Key=" + s3Key + ", uploadTimestamp=" + uploadTimestamp
+				+ ", userId=" + userId + ", userEmail=" + userEmail + "]";
 	}
+
+
 
 }
