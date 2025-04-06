@@ -105,7 +105,7 @@ public class VideoIngestionUseCase {
 				    null, // videoDuration ainda será calculado no processamento
 				    userId,
 				    userEmail,
-				    ProcessingStatus.PROCESSING,
+				    ProcessingStatus.PENDING,
 				    null, // errorMessage
 				    null, // resultBucketName
 				    null, // resultObjectKey

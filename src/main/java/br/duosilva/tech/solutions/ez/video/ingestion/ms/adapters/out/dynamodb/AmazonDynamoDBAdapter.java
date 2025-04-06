@@ -43,24 +43,24 @@ public class AmazonDynamoDBAdapter implements VideoMetadataRepository {
         LOGGER.debug("Saving video metadata for videoId={} and userId={}", metadata.getId(), metadata.getUserId());
     }
 
-    @Override
-    public Optional<VideoMetadata> findById(String userId, String videoId) {
-        Map<String, AttributeValue> key = Map.of(
-                "userId", AttributeValue.fromS(userId),
-                "id", AttributeValue.fromS(videoId)
-        );
 
-        GetItemRequest request = GetItemRequest.builder()
-                .tableName(amazonProperties.getDynamodb().getTableName())
-                .key(key)
-                .build();
+	@Override
+	public Optional<VideoMetadata> findById(String videoId) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
 
-        var response = dynamoDbClient.getItem(request);
-        if (!response.hasItem()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(VideoMetadataMapper.fromDynamoItem(response.item()));
-    }
-
+	/*
+	 * @Override public Optional<VideoMetadata> findById(String userId, String
+	 * videoId) { Map<String, AttributeValue> key = Map.of( "userId",
+	 * AttributeValue.fromS(userId), "id", AttributeValue.fromS(videoId) );
+	 * 
+	 * GetItemRequest request = GetItemRequest.builder()
+	 * .tableName(amazonProperties.getDynamodb().getTableName()) .key(key) .build();
+	 * 
+	 * var response = dynamoDbClient.getItem(request); if (!response.hasItem()) {
+	 * return Optional.empty(); }
+	 * 
+	 * return Optional.of(VideoMetadataMapper.fromDynamoItem(response.item())); }
+	 */
 }

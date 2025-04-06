@@ -12,6 +12,6 @@ package br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model;
  * */
 public enum ProcessingStatus {
 
-	PENDING, PROCESSING, COMPLETED, FAILED
+	PENDING, COMPLETED, FAILED
 
 }
