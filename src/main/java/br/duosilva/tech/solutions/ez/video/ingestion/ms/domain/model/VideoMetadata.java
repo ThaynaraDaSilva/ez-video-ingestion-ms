@@ -1,37 +1,39 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.ZoneId;
 
 public class VideoMetadata {
-	
+
 	private final String id;
-    private final String originalFileName;
-    private final String contentType;
-    private final long fileSizeBytes;
+	private final String originalFileName;
+	private final String contentType;
+	private final long fileSizeBytes;
 
-    private final LocalDateTime uploadedAt;
+	private final Long videoDuration;
 
-    private final String userId;
-    private final String userEmail;
+	private final LocalDateTime uploadedAt;
 
-    private ProcessingStatus status;
-    private String errorMessage;
+	private final String userId;
+	private final String userEmail;
 
-    private String resultBucketName;
-    private String resultObjectKey;
-    private LocalDateTime processedAt;
-	
+	private ProcessingStatus status;
+	private String errorMessage;
 
-	public VideoMetadata(String id, String originalFileName, String contentType, long fileSizeBytes,
-			LocalDateTime uploadedAt, String userId, String userEmail, ProcessingStatus status, String errorMessage,
-			String resultBucketName, String resultObjectKey, LocalDateTime processedAt) {
+	private String resultBucketName;
+	private String resultObjectKey;
+	private LocalDateTime processedAt;
+
+	public VideoMetadata(String id, String originalFileName, String contentType, long fileSizeBytes, Long videoDuration,
+			String userId, String userEmail, ProcessingStatus status, String errorMessage, String resultBucketName,
+			String resultObjectKey, LocalDateTime processedAt) {
 		super();
-		this.id = UUID.randomUUID().toString();
+		this.id = id;
 		this.originalFileName = originalFileName;
 		this.contentType = contentType;
 		this.fileSizeBytes = fileSizeBytes;
-		this.uploadedAt = uploadedAt;
+		this.videoDuration = videoDuration;
+		this.uploadedAt = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 		this.userId = userId;
 		this.userEmail = userEmail;
 		this.status = status;
@@ -42,21 +44,21 @@ public class VideoMetadata {
 	}
 
 	public void markAsProcessing() {
-        this.status = ProcessingStatus.PROCESSING;
-    }
+		this.status = ProcessingStatus.PENDING;
+	}
 
-    public void markAsCompleted(String resultBucketName, String resultObjectKey) {
-        this.status = ProcessingStatus.COMPLETED;
-        this.resultBucketName = resultBucketName;
-        this.resultObjectKey = resultObjectKey;
-        this.processedAt = LocalDateTime.now();
-    }
+	public void markAsCompleted(String resultBucketName, String resultObjectKey) {
+		this.status = ProcessingStatus.COMPLETED;
+		this.resultBucketName = resultBucketName;
+		this.resultObjectKey = resultObjectKey;
+		this.processedAt = LocalDateTime.now();
+	}
 
-    public void markAsFailed(String errorMessage) {
-        this.status = ProcessingStatus.FAILED;
-        this.errorMessage = errorMessage;
-        this.processedAt = LocalDateTime.now();
-    }
+	public void markAsFailed(String errorMessage) {
+		this.status = ProcessingStatus.FAILED;
+		this.errorMessage = errorMessage;
+		this.processedAt = LocalDateTime.now();
+	}
 
 	public ProcessingStatus getStatus() {
 		return status;
@@ -114,6 +116,10 @@ public class VideoMetadata {
 		return fileSizeBytes;
 	}
 
+	public Long getVideoDuration() {
+		return videoDuration;
+	}
+
 	public LocalDateTime getUploadedAt() {
 		return uploadedAt;
 	}
@@ -125,6 +131,5 @@ public class VideoMetadata {
 	public String getUserEmail() {
 		return userEmail;
 	}
- 
 
 }
