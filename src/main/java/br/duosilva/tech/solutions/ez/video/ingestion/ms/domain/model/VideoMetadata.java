@@ -5,7 +5,7 @@ import java.time.ZoneId;
 
 public class VideoMetadata {
 
-	private final String id;
+	private final String videoId;
 	private final String originalFileName;
 	private final String contentType;
 	private final long fileSizeBytes;
@@ -24,11 +24,11 @@ public class VideoMetadata {
 	private String resultObjectKey;
 	private LocalDateTime processedAt;
 
-	public VideoMetadata(String id, String originalFileName, String contentType, long fileSizeBytes, Long videoDuration,
+	public VideoMetadata(String videoId, String originalFileName, String contentType, long fileSizeBytes, Long videoDuration,
 			String userId, String userEmail, ProcessingStatus status, String errorMessage, String resultBucketName,
 			String resultObjectKey, LocalDateTime processedAt) {
 		super();
-		this.id = id;
+		this.videoId = videoId;
 		this.originalFileName = originalFileName;
 		this.contentType = contentType;
 		this.fileSizeBytes = fileSizeBytes;
@@ -100,8 +100,8 @@ public class VideoMetadata {
 		this.processedAt = processedAt;
 	}
 
-	public String getId() {
-		return id;
+	public String getVideoId() {
+		return videoId;
 	}
 
 	public String getOriginalFileName() {
