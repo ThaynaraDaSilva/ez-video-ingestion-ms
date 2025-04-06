@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class VideoIngestionController {
 
 	private static final String USER_ID = "6c0dc669-a18e-40d1-93ea-ba328a8daaed";
+	private static final String USER_EMAIL = "thaynara-r@hotmail.com";
 
 	private VideoIngestionUseCase videoIngestionUseCase;
 
@@ -28,7 +29,7 @@ public class VideoIngestionController {
 	@PostMapping(value = "/upload-video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Void> uploadVideo(@RequestPart("files") MultipartFile[] multipartFiles) {
 
-		videoIngestionUseCase.ingestVideo(multipartFiles, USER_ID);
+		videoIngestionUseCase.ingestVideo(multipartFiles, USER_ID, USER_EMAIL);
 		return ResponseEntity.accepted().build();
 
 	}
