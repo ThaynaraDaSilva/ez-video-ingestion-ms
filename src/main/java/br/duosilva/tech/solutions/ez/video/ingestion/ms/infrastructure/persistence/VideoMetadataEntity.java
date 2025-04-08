@@ -2,6 +2,7 @@ package br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.persiste
 
 import java.time.LocalDateTime;
 
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingStatus;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
@@ -15,7 +16,7 @@ public class VideoMetadataEntity {
 	private Long videoDuration;
 	private String userId;
 	private String userEmail;
-	private String status;
+	private ProcessingStatus status;
 	private String errorMessage;
 	private String resultBucketName;
 	private String resultObjectKey;
@@ -28,7 +29,7 @@ public class VideoMetadataEntity {
 	}
 
 	public VideoMetadataEntity(String videoId, String originalFileName, String contentType, Long fileSizeBytes,
-			Long videoDuration, String userId, String userEmail, String status, String errorMessage,
+			Long videoDuration, String userId, String userEmail, ProcessingStatus status, String errorMessage,
 			String resultBucketName, String resultObjectKey, LocalDateTime processedAt) {
 		super();
 		this.videoId = videoId;
@@ -98,11 +99,11 @@ public class VideoMetadataEntity {
 		this.userEmail = userEmail;
 	}
 
-	public String getStatus() {
+	public ProcessingStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(ProcessingStatus status) {
 		this.status = status;
 	}
 

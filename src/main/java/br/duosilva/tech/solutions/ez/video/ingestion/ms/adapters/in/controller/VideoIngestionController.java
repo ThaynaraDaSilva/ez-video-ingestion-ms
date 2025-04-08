@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusUpdateRequestDto;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusRequestDto;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases.VideoIngestionUseCase;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases.VideoStatusUseCase;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -42,9 +42,9 @@ public class VideoIngestionController {
 
 	}
 	
-	@PutMapping("/videos/{videoId}/status")
+	@PutMapping("/videos/{videoId}/update-status")
 	public ResponseEntity<Void> updateVideoStatus(@PathVariable String videoId,
-	                                              @RequestBody @Valid VideoStatusUpdateRequestDto requestDto) {
+	                                              @RequestBody @Valid VideoStatusRequestDto requestDto) {
 	    videoStatusUseCase.updateVideoStatus(videoId, requestDto);
 	    return ResponseEntity.noContent().build();
 	}

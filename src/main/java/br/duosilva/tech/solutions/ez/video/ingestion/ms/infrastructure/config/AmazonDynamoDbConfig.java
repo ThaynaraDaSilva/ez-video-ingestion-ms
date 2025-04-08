@@ -47,6 +47,13 @@ public class AmazonDynamoDbConfig {
     }
     
     @Bean
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient(DynamoDbClient dynamoDbClient) {
+        return DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(dynamoDbClient)
+                .build();
+    }
+    
+    @Bean
     public DynamoDbTable<VideoMetadataEntity> videoMetadataTable(DynamoDbEnhancedClient enhancedClient) {
         return enhancedClient.table("video_metadata", TableSchema.fromBean(VideoMetadataEntity.class));
     }

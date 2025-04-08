@@ -4,7 +4,6 @@ package br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model;
  * 
  * <ul>
  *   <li><b>PENDING</b>: Vídeo enviado para fila, aguardando início do processamento</li>
- *   <li><b>PROCESSING</b>: Processamento em andamento</li>
  *   <li><b>COMPLETED</b>: Processamento finalizado com sucesso, arquivo .zip gerado</li>
  *   <li><b>FAILED</b>: Ocorreu erro no processamento, notificação será enviada ao usuário</li>
  * </ul>
@@ -13,5 +12,4 @@ package br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model;
 public enum ProcessingStatus {
 
 	PENDING, COMPLETED, FAILED
-
 }

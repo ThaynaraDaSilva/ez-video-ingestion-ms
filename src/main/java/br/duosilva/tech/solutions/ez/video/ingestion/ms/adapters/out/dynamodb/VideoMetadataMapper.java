@@ -1,6 +1,5 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.dynamodb;
 
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingStatus;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.VideoMetadata;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.persistence.VideoMetadataEntity;
 
@@ -16,7 +15,7 @@ public class VideoMetadataMapper {
         entity.setVideoDuration(domain.getVideoDuration());
         entity.setUserId(domain.getUserId());
         entity.setUserEmail(domain.getUserEmail());
-        entity.setStatus(domain.getStatus().name());
+        entity.setStatus(domain.getStatus());
         entity.setErrorMessage(domain.getErrorMessage());
         entity.setResultBucketName(domain.getResultBucketName());
         entity.setResultObjectKey(domain.getResultObjectKey());
@@ -33,7 +32,7 @@ public class VideoMetadataMapper {
             entity.getVideoDuration(),
             entity.getUserId(),
             entity.getUserEmail(),
-            ProcessingStatus.valueOf(entity.getStatus()),
+            entity.getStatus(),
             entity.getErrorMessage(),
             entity.getResultBucketName(),
             entity.getResultObjectKey(),
