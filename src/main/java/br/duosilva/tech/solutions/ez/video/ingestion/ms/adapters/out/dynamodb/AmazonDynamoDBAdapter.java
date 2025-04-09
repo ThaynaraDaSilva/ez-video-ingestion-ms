@@ -29,7 +29,6 @@ public class AmazonDynamoDBAdapter implements VideoMetadataRepository {
 	@Override
 	public void save(VideoMetadata metadata) {
 		
-		System.out.println("STATUS: "+ metadata.getStatus());
 		VideoMetadataEntity entity = VideoMetadataMapper.toEntity(metadata);
 		videoMetadataDynamoTable.putItem(entity);
 
