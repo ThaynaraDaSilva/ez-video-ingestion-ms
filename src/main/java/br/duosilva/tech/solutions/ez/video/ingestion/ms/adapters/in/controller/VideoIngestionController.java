@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusRequestDto;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases.VideoIngestionUseCase;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases.VideoStatusUseCase;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 

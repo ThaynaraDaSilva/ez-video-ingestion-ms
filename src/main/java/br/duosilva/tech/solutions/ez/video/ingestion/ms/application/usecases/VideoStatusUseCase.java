@@ -1,5 +1,8 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,9 +37,7 @@ public class VideoStatusUseCase {
 
 			// 2. Atualiza os campos
 			videoMetadata.setStatus(dto.getStatus());
-			System.out.println("PROCESSED AT: "+ dto.getProcessedAt());
-			System.out.println("STATUS 0 NO USE CASE: "+ dto.getStatus());
-			System.out.println("STATUS 1  NO USE CASE: "+ videoMetadata.getStatus());
+		
 			if(dto.getErrorMessage()!= null) {
 				videoMetadata.setErrorMessage(dto.getErrorMessage());
 			}else {
@@ -44,7 +45,7 @@ public class VideoStatusUseCase {
 			}
 			
 			videoMetadata.setResultObjectKey(dto.getResultObjectKey());
-			videoMetadata.setProcessedAt(dto.getProcessedAt());
+			videoMetadata.setProcessedAt(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
 
 			// 3. Salva novamente no banco
 			amazonDynamoDBAdapter.save(videoMetadata);
