@@ -8,6 +8,6 @@ public interface VideoMetadataRepository {
 	
 	void save(VideoMetadata metadata);
 
-    Optional<VideoMetadata> findById(String userId, String videoId);
+    Optional<VideoMetadata> findById(String videoId);
 
 }

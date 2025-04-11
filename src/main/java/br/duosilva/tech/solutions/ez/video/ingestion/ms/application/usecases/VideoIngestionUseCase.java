@@ -54,7 +54,7 @@ public class VideoIngestionUseCase {
 	 * @throws BusinessRuleException se não houver vídeos ou se alguma regra de
 	 *                               negócio for violada
 	 */
-	public void ingestVideo(MultipartFile[] multipartFiles, String userId) {
+	public void ingestVideo(MultipartFile[] multipartFiles, String userId, String userEmail) {
 
 		this.validateFilesPresence(multipartFiles);
 
@@ -64,7 +64,7 @@ public class VideoIngestionUseCase {
 			if (file.isEmpty())
 				continue;
 
-			this.ingestSingleVideoFile(file, userId);
+			this.ingestSingleVideoFile(file, userId, userEmail);
 		}
 
 	}
@@ -75,10 +75,10 @@ public class VideoIngestionUseCase {
 		}
 	}
 
-	private void ingestSingleVideoFile(MultipartFile file, String userId) {
+	private void ingestSingleVideoFile(MultipartFile file, String userId, String userEmail) {
 		long startTime = System.currentTimeMillis();
 		LOGGER.info("############################################################");
-		LOGGER.info("#### VIDEO PROCESSING STARTED: {} ####", file.getOriginalFilename());
+		LOGGER.info("#### VIDEO UPLOAD PROCESS STARTED: {} ####", file.getOriginalFilename());
 
 		videoUploadPolicyService.validateFileSize(file);
 
@@ -104,8 +104,8 @@ public class VideoIngestionUseCase {
 				    file.getSize(),
 				    null, // videoDuration ainda será calculado no processamento
 				    userId,
-				    null, // userEmail — você ainda não tem no fluxo atual, pode deixar null
-				    ProcessingStatus.PROCESSING,
+				    userEmail,
+				    ProcessingStatus.PENDING,
 				    null, // errorMessage
 				    null, // resultBucketName
 				    null, // resultObjectKey
@@ -118,10 +118,12 @@ public class VideoIngestionUseCase {
 			VideoIngestionMessage message = new VideoIngestionMessage();
 			message.setVideoId(videoId);
 			message.setOriginalFileName(file.getOriginalFilename());
-			message.setS3Bucket(amazonS3Adapter.getBucketName());
+			message.setS3BucketName(amazonS3Adapter.getBucketName());
 			message.setS3Key(s3Key);
 			message.setUploadTimestamp(DateTimeUtils.getCurrentUtcTimestamp());
 			message.setUserId(userId);
+			message.setUserEmail(userEmail);
+			
 
 			amazonSQSAdapter.publishVideoIngestionMessage(message);
 
@@ -130,7 +132,7 @@ public class VideoIngestionUseCase {
 		} finally {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
-			LOGGER.info("#### VIDEO PROCESSING COMPLETED: {} ####", file.getOriginalFilename());
+			LOGGER.info("#### VIDEO UPLOAD PROCESS COMPLETED: {} ####", file.getOriginalFilename());
 			LOGGER.info("#### TOTAL PROCESSING TIME: {} ####", DateTimeUtils.formatDuration(duration));
 		}
 	}
