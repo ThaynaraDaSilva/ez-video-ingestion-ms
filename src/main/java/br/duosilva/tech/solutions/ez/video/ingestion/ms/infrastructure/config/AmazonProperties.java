@@ -12,6 +12,7 @@ public class AmazonProperties {
 	private S3 s3;
 	private Sqs sqs;
 	private DynamoDb dynamodb;
+	private Cognito cognito;
 
 	public static class Credentials {
 		private String accessKey;
@@ -90,21 +91,44 @@ public class AmazonProperties {
 	public static class DynamoDb {
 		private String tableName;
 		private String endpoint;
-		
+
 		public String getTableName() {
 			return tableName;
 		}
+
 		public void setTableName(String tableName) {
 			this.tableName = tableName;
 		}
+
 		public String getEndpoint() {
 			return endpoint;
 		}
+
 		public void setEndpoint(String endpoint) {
 			this.endpoint = endpoint;
 		}
-		
-		
+
+	}
+
+	public static class Cognito {
+		private String clientId;
+		private String issuerUri;
+
+		public String getClientId() {
+			return clientId;
+		}
+
+		public void setClientId(String clientId) {
+			this.clientId = clientId;
+		}
+
+		public String getIssuerUri() {
+			return issuerUri;
+		}
+
+		public void setIssuerUri(String issuerUri) {
+			this.issuerUri = issuerUri;
+		}
 	}
 
 	public String getRegion() {
@@ -147,6 +171,12 @@ public class AmazonProperties {
 		this.dynamodb = dynamodb;
 	}
 	
-	
+	public Cognito getCognito() {
+		return cognito;
+	}
+
+	public void setCognito(Cognito cognito) {
+		this.cognito = cognito;
+	}
 
 }
