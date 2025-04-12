@@ -20,17 +20,10 @@ public class OpenApiConfig {
 				.info(new Info().title("ez-video-ingestion-ms").description("DuoSilva Tech Solutions")
 						.version("1.0.0-RELEASE")
 						.license(new License().name("Apache License").url("https://github.com/ThaynaraDaSilva/ez-video-ingestion-ms"))
-						.termsOfService("https://github.com/ThaynaraDaSilva/ez-video-ingestion-ms"))
-				.addSecurityItem(new SecurityRequirement()
-						.addList("Bearer Authentication"))
-				.components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()));
+						.termsOfService("https://github.com/ThaynaraDaSilva/ez-video-ingestion-ms"));
 	}
 	
-	private SecurityScheme createAPIKeyScheme() {
-	    return new SecurityScheme().type(SecurityScheme.Type.HTTP)
-	        .bearerFormat("JWT")
-	        .scheme("bearer");
-	}
+
 
     @Bean
     InternalResourceViewResolver defaultViewResolver() {
