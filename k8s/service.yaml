@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ez-video-ingestion-ms-service
+  namespace: ez-frame-generator-namespace
+  annotations:
+    # ALB Controller usará essas anotações
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-name: "ez-frame-generator-ingestion"
+    service.beta.kubernetes.io/aws-load-balancer-target-type: ip
+spec:
+  type: LoadBalancer
+  selector:
+    app: ez-video-ingestion-ms
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
