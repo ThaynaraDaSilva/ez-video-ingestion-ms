@@ -21,7 +21,7 @@ public class AmazonSQSConfig {
 	       
 	    }
 	    
-	    @Bean
+	   /* @Bean
 	    public SqsClient sqsClient() {
 	        SqsClientBuilder builder = SqsClient.builder()
 	            .region(Region.of(amazonProperties.getRegion()))
@@ -41,6 +41,13 @@ public class AmazonSQSConfig {
 	        }
 
 	        return builder.build();
+	    }*/
+	    
+	    @Bean
+	    public SqsClient sqsClient() {
+	        return SqsClient.builder()
+	                .region(Region.of(amazonProperties.getRegion()))
+	                .build(); //Sem credentialsProvider e endpointOverride
 	    }
 
 }
