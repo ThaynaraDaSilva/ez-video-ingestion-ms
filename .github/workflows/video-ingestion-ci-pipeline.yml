@@ -5,11 +5,12 @@ on:
     branches:
       - develop
       - main
+      - feature/deploy-ms-on-aws-configuration
 env:
   
   #SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
   #SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  EKS_CLUSTER_NAME: 'ez-frame-generator-cluster-dev'
+  EKS_CLUSTER_NAME: 'ez-frame-generator-dev-cluster'
   JAVA_VERSION: '21'
   DOCKER_IMAGE_NAME: 'dasilvathaynara/ez-video-ingestion-ms'
   DOCKER_TAG_LATEST: 'latest'
@@ -136,8 +137,10 @@ jobs:
   
      - name: Apply Kubernetes manifests
        run: |
-         kubectl apply -f k8s/deployment.yaml --validate=false
-         kubectl apply -f k8s/serviceaccount.yaml
-         kubectl apply -f k8s/service.yaml
-         kubectl apply -f k8s/configmap.yaml
-         kubectl apply -f k8s/secrets.yaml
+        kubectl apply -f k8s/namespace.yaml
+        kubectl apply -f k8s/configmap.yaml
+        kubectl apply -f k8s/secrets.yaml
+        kubectl apply -f k8s/serviceaccount.yaml
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+        kubectl apply -f k8s/hpa.yaml
