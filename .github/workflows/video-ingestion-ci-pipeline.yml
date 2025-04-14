@@ -114,7 +114,7 @@ jobs:
   deploy-to-eks:
    needs: docker-build-push
    runs-on: ubuntu-latest
-   if: contains('refs/heads/develop', github.ref) || contains('refs/heads/main', github.ref)
+
    steps:
      - name: Checkout repository
        uses: actions/checkout@v3
