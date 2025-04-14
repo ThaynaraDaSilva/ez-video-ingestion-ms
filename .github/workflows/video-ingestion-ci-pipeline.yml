@@ -84,8 +84,8 @@ jobs:
   #      run: echo "🎉 Quality Gate Passed."
   #
   docker-build-push:
-    #needs:
-     # - build-and-test
+    needs:
+      - build-and-test
       #- static-code-analysis
     runs-on: ubuntu-latest
     steps:
