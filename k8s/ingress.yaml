@@ -9,7 +9,7 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
 spec:
-  ingressClassName: alb  # ESTA LINHA É ESSENCIAL
+  ingressClassName: alb
   rules:
     - http:
         paths:
