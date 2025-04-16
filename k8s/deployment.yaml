@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: ez-video-ingestion-ms
+      annotations:
+        eks.amazonaws.com/compute-type: fargate
     spec:
       serviceAccountName: frame-generator-sa  #Importante para IRSA
       containers:
