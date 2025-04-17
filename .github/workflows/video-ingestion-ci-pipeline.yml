@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - main
+      - test/unit-tests
 env:
   
   #SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
