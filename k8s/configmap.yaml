@@ -2,7 +2,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ez-video-ingestion-configmap
-  namespace: ez-frame-generator-namespace
 data:
   AWS_REGION: "us-east-1"
   DYNAMODB_TABLE_NAME: "video_metadata"

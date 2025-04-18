@@ -1,10 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ez-video-ingestion-ms-deployment
-  namespace: ez-frame-generator-namespace
+  name: ez-video-ingestion-ms
+  labels:
+    app: ez-video-ingestion-ms
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ez-video-ingestion-ms
@@ -12,12 +13,9 @@ spec:
     metadata:
       labels:
         app: ez-video-ingestion-ms
-      annotations:
-        eks.amazonaws.com/compute-type: fargate
     spec:
-      serviceAccountName: frame-generator-sa  #Importante para IRSA
       containers:
-      - name: ez-video-ingestion-ms-pod
+      - name: ez-video-ingestion-ms
         image: dasilvathaynara/ez-video-ingestion-ms:latest
         imagePullPolicy: Always
         ports:
