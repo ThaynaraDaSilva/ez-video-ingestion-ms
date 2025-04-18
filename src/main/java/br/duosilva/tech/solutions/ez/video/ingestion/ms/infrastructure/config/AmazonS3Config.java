@@ -21,7 +21,7 @@ public class AmazonS3Config {
         this.amazonProperties = amazonProperties;
     }
 
-    @Bean
+   /* @Bean
     public S3Client s3Client() {
         S3ClientBuilder builder = S3Client.builder()
             .region(Region.of(amazonProperties.getRegion()))
@@ -42,9 +42,23 @@ public class AmazonS3Config {
         }
 
         return builder.build();
+    }*/
+    
+    @Bean
+    public S3Client s3Client() {
+        return S3Client.builder()
+            .region(Region.of(amazonProperties.getRegion()))
+            .build(); // Sem credentialsProvider nem endpointOverride
     }
     
     @Bean
+    public S3Presigner s3Presigner() {
+        return S3Presigner.builder()
+            .region(Region.of(amazonProperties.getRegion()))
+            .build(); // Sem credentialsProvider nem endpointOverride
+    }
+    
+   /* @Bean
     public S3Presigner s3Presigner() {
         S3Presigner.Builder builder = S3Presigner.builder()
             .region(Region.of(amazonProperties.getRegion()))
@@ -65,6 +79,6 @@ public class AmazonS3Config {
         }
 
         return builder.build();
-    }
+    }*/
 
 }
