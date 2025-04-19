@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ez-video-ingestion-ms
+  labels:
+    app: ez-video-ingestion-ms
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: ez-video-ingestion-ms
+  template:
+    metadata:
+      labels:
+        app: ez-video-ingestion-ms
+    spec:
+      containers:
+        - name: ez-video-ingestion-ms
+          image: dasilvathaynara/ez-video-ingestion-ms:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms100m -Xmx512m -XX:+UseParallelGC"
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ez-video-ingestion-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ez-video-ingestion-secret
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_REGION
+              value: us-east-1
+
+          envFrom:
+            - configMapRef:
+                name: ez-video-ingestion-configmap
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "150Mi"
+            limits:
+              cpu: "300m"
+              memory: "500Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3

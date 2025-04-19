@@ -51,16 +51,20 @@ public class AmazonSQSAdapter {
 			throw new RuntimeException("Failed to serialize VideoIngestionMessage", e);
 		} catch (Exception e) {
 			LOGGER.error("FAILED TO PUBLISH VIDEO_INGESTION_MESSAGE TO SQS", e);
-			throw new RuntimeException("Failed to publish VideoIngestionMessage to SQS", e);
+			throw new RuntimeException("FAILED TO PUBLISH MESSAGE TO SQS", e);
 		}
 	}
 
 	private String resolveQueueUrl() {
 		String endpoint = amazonProperties.getSqs().getEndpoint();
-		String queueName = amazonProperties.getSqs().getQueueName();
+	    String queueName = amazonProperties.getSqs().getQueueName();
 
-		// Ex: http://localhost:4566/000000000000/queue-name
-		return String.format("%s/000000000000/%s", endpoint, queueName);
+	    if (endpoint != null && !endpoint.isBlank()) {
+	        return String.format("%s/000000000000/%s", endpoint, queueName);
+	    }
+
+	    // Ambiente real AWS
+	    return sqsClient.getQueueUrl(builder -> builder.queueName(queueName)).queueUrl();
 	}
 
 }
