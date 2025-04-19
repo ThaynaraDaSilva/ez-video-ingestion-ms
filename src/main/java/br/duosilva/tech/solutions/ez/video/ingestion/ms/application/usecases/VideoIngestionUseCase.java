@@ -128,7 +128,7 @@ public class VideoIngestionUseCase {
 			amazonSQSAdapter.publishVideoIngestionMessage(message);
 
 		} catch (Exception e) {
-			throw new BusinessRuleException("FAILED TO PROCESS VIDEO: " + e);
+			throw new BusinessRuleException("FAILED TO UPLOAD VIDEO: " + e);
 		} finally {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
