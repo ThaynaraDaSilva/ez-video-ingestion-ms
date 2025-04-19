@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - test/unit-tests
 
   workflow_dispatch:
 
