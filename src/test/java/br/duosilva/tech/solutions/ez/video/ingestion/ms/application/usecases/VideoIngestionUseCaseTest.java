@@ -138,7 +138,7 @@ class VideoIngestionUseCaseTest {
 
             BusinessRuleException exception = assertThrows(BusinessRuleException.class,
                     () -> videoIngestionUseCase.ingestVideo(files, userId, userEmail));
-            assertTrue(exception.getMessage().contains("FAILED TO PROCESS VIDEO"));
+            assertTrue(exception.getMessage().contains("FAILED TO UPLOAD VIDEO"));
             verify(videoMetadataRepository, never()).save(any(VideoMetadata.class));
             verify(amazonSQSAdapter, never()).publishVideoIngestionMessage(any(VideoIngestionMessage.class));
         }
