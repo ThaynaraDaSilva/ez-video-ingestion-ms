@@ -3,9 +3,8 @@ name: Video Ingestion MS CI/CD Pipeline
 on:
   push:
     branches:
-      - develop
       - main
-      - feature/deploy-ms-on-aws-configuration
+      - hotfix/upload-video-aws-environment
 env:
   
   #SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
@@ -134,6 +133,13 @@ jobs:
   
      - name: Update kubeconfig for EKS
        run: aws eks update-kubeconfig --region us-east-1 --name ${{ env.EKS_CLUSTER_NAME }}
+
+     - name: Create AWS credentials secret in Kubernetes
+       run: |
+         kubectl create secret generic ez-frame-ingestion-secret \
+           --from-literal=AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+           --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+           --dry-run=client -o yaml | kubectl apply -f -
   
      - name: Apply Kubernetes manifests
        run: |
