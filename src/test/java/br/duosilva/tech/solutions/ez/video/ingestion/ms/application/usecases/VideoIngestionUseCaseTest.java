@@ -1,15 +1,24 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases;
 
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.messaging.AmazonSQSAdapter;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3.AmazonS3Adapter;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoIngestionMessage;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingStatus;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.VideoMetadata;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.repository.VideoMetadataRepository;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.service.VideoUploadPolicyService;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.ErrorMessages;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.s3.S3KeyGenerator;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,11 +27,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.messaging.AmazonSQSAdapter;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.s3.AmazonS3Adapter;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoIngestionMessage;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusResponseDto;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingStatus;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.VideoMetadata;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.repository.VideoMetadataRepository;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.service.VideoUploadPolicyService;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.ErrorMessages;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.s3.S3KeyGenerator;
 
 @ExtendWith(MockitoExtension.class)
 class VideoIngestionUseCaseTest {
@@ -41,6 +56,9 @@ class VideoIngestionUseCaseTest {
 
     @InjectMocks
     private VideoIngestionUseCase videoIngestionUseCase;
+    
+    @InjectMocks
+    private VideoStatusUseCase videoStatusUseCase;
 
     private MultipartFile mockFile;
     private String userId = "user123";
@@ -51,6 +69,56 @@ class VideoIngestionUseCaseTest {
         mockFile = mock(MultipartFile.class);
     }
 
+    @Test
+    void listVideosByUserEmail_shouldReturnList_whenVideosExist() {
+        // Arrange
+        String userEmail = "test@example.com";
+        LocalDateTime processedAt = LocalDateTime.of(2025, 4, 20, 14, 0);
+
+        List<VideoMetadata> videoList = List.of(
+                new VideoMetadata(
+                        "abc123",              // videoId
+                        "video.mp4",           // originalFileName
+                        userEmail,             // userEmail
+                        ProcessingStatus.COMPLETED, // status
+                        "processed/output.zip",     // resultObjectKey
+                        processedAt                 // processedAt
+                )
+        );
+
+        when(videoMetadataRepository.findByUserEmail(userEmail)).thenReturn(videoList);
+
+        // Act
+        List<VideoStatusResponseDto> result = videoStatusUseCase.listVideosByUserEmail(userEmail);
+
+        // Assert
+        assertEquals(1, result.size());
+
+        VideoStatusResponseDto dto = result.get(0);
+        assertEquals("abc123", dto.getVideoId());
+        assertEquals("video.mp4", dto.getOriginalFileName());
+        assertEquals(processedAt, dto.getProcessedAt());
+        assertEquals("processed/output.zip", dto.getResultObjectKey());
+        assertEquals(ProcessingStatus.COMPLETED, dto.getStatus());
+        assertEquals(userEmail, dto.getUserEmail());
+
+        verify(videoMetadataRepository, times(1)).findByUserEmail(userEmail);
+    }
+
+    @Test
+    void listVideosByUserEmail_shouldThrowException_whenNoVideosFound() {
+        // Arrange
+        String userEmail = "empty@example.com";
+        when(videoMetadataRepository.findByUserEmail(userEmail)).thenReturn(List.of());
+
+        // Act & Assert
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+        videoStatusUseCase.listVideosByUserEmail(userEmail));
+
+        assertEquals("No videos processed for the requested email.", exception.getMessage());
+        verify(videoMetadataRepository, times(1)).findByUserEmail(userEmail);
+    }
+    
     @Test
     void testIngestVideo_SuccessfulUpload() {
         MultipartFile[] files = { mockFile };
