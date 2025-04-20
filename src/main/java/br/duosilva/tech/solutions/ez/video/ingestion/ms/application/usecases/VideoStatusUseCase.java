@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.dynamodb.AmazonDynamoDBAdapter;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.http.NotificationHttpClient;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.NotificationRequest;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusRequestDto;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingStatus;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.VideoMetadata;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.repository.VideoMetadataRepository;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.http.NotificationHttpClient;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.NotificationRequest;
-import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingStatus;
 
 @Component
 public class VideoStatusUseCase {
@@ -88,10 +88,10 @@ public class VideoStatusUseCase {
 		notificationRequest.setEmail(videoMetadata.getUserEmail());
 		try {
 			notificationHttpClient.sendNotification(notificationRequest);
-			LOGGER.info("Notificação enviada para o Notification Service para o vídeo {}", videoMetadata.getVideoId());
+			LOGGER.info("DADOS DO VIDEO {} ENVIADO AO NOTIFICATION-MS", videoMetadata.getVideoId());
 		} catch (Exception e) {
-			LOGGER.error("Erro ao enviar notificação para o vídeo {}: {}", videoMetadata.getVideoId(), e.getMessage());
-			throw new RuntimeException("Falha ao enviar notificação", e);
+			LOGGER.error("ERRO AO ENVIAR DADOS DO VIDEO {} PARA O NOTIFICATION-MS", videoMetadata.getVideoId());
+			throw new RuntimeException("ERRO AO ENVIAR DADOS DO VIDEO", e);
 		}
 	}
 

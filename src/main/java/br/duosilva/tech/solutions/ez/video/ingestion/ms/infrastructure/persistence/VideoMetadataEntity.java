@@ -21,7 +21,7 @@ public class VideoMetadataEntity {
 	private String resultBucketName;
 	private String resultObjectKey;
 	private LocalDateTime processedAt;
-	private boolean notificationSent = false;
+	private boolean notificationSent;
 	
 
 	public VideoMetadataEntity() {
