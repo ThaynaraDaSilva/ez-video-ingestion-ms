@@ -10,8 +10,6 @@ public class VideoStatusRequestDto {
 
 	private String errorMessage;
 	
-	private String email;
-
 	public VideoStatusRequestDto() {
 		super();
 	}
@@ -39,15 +37,6 @@ public class VideoStatusRequestDto {
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
 	
 
 }

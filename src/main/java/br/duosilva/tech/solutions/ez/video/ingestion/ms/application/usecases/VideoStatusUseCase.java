@@ -60,7 +60,6 @@ public class VideoStatusUseCase {
 			// 4. Se o status for "FAILED", envia notificacao
 
 			if (dto.getStatus() == ProcessingStatus.FAILED) {
-
 				sendFailureNotification(videoMetadata);
 				videoMetadata.setNotificationSent(true);
 				LOGGER.info("#### NOTIFICATION SENT FOR VIDEO ID: {} ####", videoMetadata.getVideoId());
@@ -68,11 +67,10 @@ public class VideoStatusUseCase {
 			
 			// 3. Salva novamente no banco
 			amazonDynamoDBAdapter.save(videoMetadata);
+			LOGGER.info("#### VIDEOMETADATA SAVED IN DATABASE ####");
 
 		} catch (Exception e) {
-			LOGGER.info("#### EXCEPTION ####");
 			// Envia notificacao em caso de falha ao atualizar o status
-			System.out.println("ENTROU NESTA CONDICAO PARA ENVIO########################");
 			if (videoMetadata != null) {
 				sendFailureNotification(videoMetadata);
 			}
