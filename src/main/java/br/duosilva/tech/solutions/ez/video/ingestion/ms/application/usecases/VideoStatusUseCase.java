@@ -2,6 +2,8 @@ package br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.dynamodb.Am
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.http.NotificationHttpClient;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.NotificationRequest;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusRequestDto;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusResponseDto;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingStatus;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.VideoMetadata;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.repository.VideoMetadataRepository;
@@ -32,6 +35,27 @@ public class VideoStatusUseCase {
 		this.notificationHttpClient = notificationHttpClient;
 	}
 
+	public List<VideoStatusResponseDto> listVideosByUserEmail(String userEmail) {
+		
+		
+		 List<VideoMetadata> videoMetadataList = videoMetadataRepository.findByUserEmail(userEmail);
+
+		    if (videoMetadataList == null || videoMetadataList.isEmpty()) {
+		        throw new BusinessRuleException("No videos processed for the requested email.");
+		    }
+
+		    return videoMetadataList.stream()
+		            .map(metadata -> new VideoStatusResponseDto(
+		                    metadata.getVideoId(),
+		                    metadata.getOriginalFileName(),
+		                    metadata.getProcessedAt(),
+		                    metadata.getResultObjectKey(),
+		                    metadata.getStatus(),
+		                    metadata.getUserEmail()
+		            ))
+		            .collect(Collectors.toList());
+		
+	}
 	public void updateVideoStatus(String videoId, VideoStatusRequestDto dto) {
 		long startTime = System.currentTimeMillis();
 		LOGGER.info("############################################################");
