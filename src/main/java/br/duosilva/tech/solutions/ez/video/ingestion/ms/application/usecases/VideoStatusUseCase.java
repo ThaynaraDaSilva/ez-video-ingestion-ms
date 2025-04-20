@@ -15,6 +15,7 @@ import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.ProcessingS
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.VideoMetadata;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.repository.VideoMetadataRepository;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.frameworks.exception.BusinessRuleException;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.util.DateTimeUtils;
 
 @Component
 public class VideoStatusUseCase {
@@ -32,6 +33,7 @@ public class VideoStatusUseCase {
 	}
 
 	public void updateVideoStatus(String videoId, VideoStatusRequestDto dto) {
+		long startTime = System.currentTimeMillis();
 		LOGGER.info("############################################################");
 		LOGGER.info("#### VIDEO UPDATE PROCESS STARTED ####");
 		// 1. Busca o video no repo
@@ -55,8 +57,6 @@ public class VideoStatusUseCase {
 
 			
 
-			LOGGER.info("#### VIDEO PROCESS FINISHED ####");
-
 			// 4. Se o status for "FAILED", envia notificacao
 
 			if (dto.getStatus() == ProcessingStatus.FAILED) {
@@ -68,13 +68,20 @@ public class VideoStatusUseCase {
 			// 3. Salva novamente no banco
 			amazonDynamoDBAdapter.save(videoMetadata);
 			LOGGER.info("#### VIDEOMETADATA SAVED IN DATABASE ####");
+			
 
 		} catch (Exception e) {
 			// Envia notificacao em caso de falha ao atualizar o status
 			if (videoMetadata != null) {
 				sendFailureNotification(videoMetadata);
 			}
-			throw new BusinessRuleException("FAILED TO UPDATE VIDEO STATUS: " + e);
+			throw new BusinessRuleException("#### FAILED TO UPDATE VIDEO STATUS: ####" + e);
+		}
+		finally {
+			long endTime = System.currentTimeMillis();
+			long duration = endTime - startTime;
+			LOGGER.info("#### VIDEO UPDATE PROCESS ENDED ####");
+			LOGGER.info("#### TOTAL PROCESSING TIME: {} ####", DateTimeUtils.formatDuration(duration));
 		}
 
 	}
@@ -88,10 +95,10 @@ public class VideoStatusUseCase {
 		notificationRequest.setEmail(videoMetadata.getUserEmail());
 		try {
 			notificationHttpClient.sendNotification(notificationRequest);
-			LOGGER.info("DADOS DO VIDEO {} ENVIADO AO NOTIFICATION-MS", videoMetadata.getVideoId());
+			LOGGER.info("#### DADOS DO VIDEO: {}, ENVIADO AO NOTIFICATION-MS ####", videoMetadata.getVideoId());
 		} catch (Exception e) {
-			LOGGER.error("ERRO AO ENVIAR DADOS DO VIDEO {} PARA O NOTIFICATION-MS", videoMetadata.getVideoId());
-			throw new RuntimeException("ERRO AO ENVIAR DADOS DO VIDEO", e);
+			LOGGER.error("#### ERRO AO ENVIAR DADOS DO VIDEO: {}, PARA O NOTIFICATION-MS ####", videoMetadata.getVideoId());
+			throw new RuntimeException("#### ERRO AO ENVIAR DADOS DO VIDEO ####", e);
 		}
 	}
 
