@@ -23,6 +23,8 @@ public class VideoMetadata {
 	private String resultBucketName;
 	private String resultObjectKey;
 	private LocalDateTime processedAt;
+	private boolean notificationSent = false;
+
 
 	public VideoMetadata(String videoId, String originalFileName, String contentType, long fileSizeBytes, Long videoDuration,
 			String userId, String userEmail, ProcessingStatus status, String errorMessage, String resultBucketName,
@@ -58,6 +60,8 @@ public class VideoMetadata {
 		this.status = ProcessingStatus.FAILED;
 		this.errorMessage = errorMessage;
 		this.processedAt = LocalDateTime.now();
+		this.notificationSent = true;
+
 	}
 
 	public ProcessingStatus getStatus() {
@@ -130,6 +134,14 @@ public class VideoMetadata {
 
 	public String getUserEmail() {
 		return userEmail;
+	}
+	
+	public boolean isNotificationSent() {
+		return notificationSent;
+	}
+
+	public void setNotificationSent(boolean notificationSent) {
+		this.notificationSent = notificationSent;
 	}
 
 }
