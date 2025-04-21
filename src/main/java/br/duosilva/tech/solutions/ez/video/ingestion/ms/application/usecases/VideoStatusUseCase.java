@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.dynamodb.AmazonDynamoDBAdapter;
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.dynamodb.VideoMetadataMapper;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.http.NotificationHttpClient;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.NotificationRequest;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusRequestDto;
@@ -45,14 +46,7 @@ public class VideoStatusUseCase {
 		    }
 
 		    return videoMetadataList.stream()
-		            .map(metadata -> new VideoStatusResponseDto(
-		                    metadata.getVideoId(),
-		                    metadata.getOriginalFileName(),
-		                    metadata.getProcessedAt(),
-		                    metadata.getResultObjectKey(),
-		                    metadata.getStatus(),
-		                    metadata.getUserEmail()
-		            ))
+		    		  .map(VideoMetadataMapper::toDto)
 		            .collect(Collectors.toList());
 		
 	}
