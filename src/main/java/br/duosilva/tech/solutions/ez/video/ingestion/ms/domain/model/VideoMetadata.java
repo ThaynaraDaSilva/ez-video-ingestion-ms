@@ -5,17 +5,17 @@ import java.time.ZoneId;
 
 public class VideoMetadata {
 
-	private final String videoId;
-	private final String originalFileName;
-	private final String contentType;
-	private final long fileSizeBytes;
+	private String videoId;
+	private String originalFileName;
+	private String contentType;
+	private long fileSizeBytes;
 
-	private final Long videoDuration;
+	private Long videoDuration;
 
-	private final LocalDateTime uploadedAt;
+	private LocalDateTime uploadedAt;
 
-	private final String userId;
-	private final String userEmail;
+	private String userId;
+	private String userEmail;
 
 	private ProcessingStatus status;
 	private String errorMessage;
@@ -25,10 +25,20 @@ public class VideoMetadata {
 	private LocalDateTime processedAt;
 	private boolean notificationSent = false;
 
-
-	public VideoMetadata(String videoId, String originalFileName, String contentType, long fileSizeBytes, Long videoDuration,
-			String userId, String userEmail, ProcessingStatus status, String errorMessage, String resultBucketName,
+	public VideoMetadata(String videoId, String originalFileName, String userEmail, ProcessingStatus status,
 			String resultObjectKey, LocalDateTime processedAt) {
+		super();
+		this.videoId = videoId;
+		this.originalFileName = originalFileName;
+		this.userEmail = userEmail;
+		this.status = status;
+		this.resultObjectKey = resultObjectKey;
+		this.processedAt = processedAt;
+	}
+
+	public VideoMetadata(String videoId, String originalFileName, String contentType, long fileSizeBytes,
+			Long videoDuration, String userId, String userEmail, ProcessingStatus status, String errorMessage,
+			String resultBucketName, String resultObjectKey, LocalDateTime processedAt) {
 		super();
 		this.videoId = videoId;
 		this.originalFileName = originalFileName;
@@ -135,7 +145,7 @@ public class VideoMetadata {
 	public String getUserEmail() {
 		return userEmail;
 	}
-	
+
 	public boolean isNotificationSent() {
 		return notificationSent;
 	}
