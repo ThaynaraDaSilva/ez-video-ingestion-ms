@@ -2,6 +2,7 @@ package br.duosilva.tech.solutions.ez.video.ingestion.ms.application.usecases;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,19 +38,17 @@ public class VideoStatusUseCase {
 	}
 
 	public List<VideoStatusResponseDto> listVideosByUserEmail(String userEmail) {
-		
-		
-		 List<VideoMetadata> videoMetadataList = videoMetadataRepository.findByUserEmail(userEmail);
+		List<VideoMetadata> videoMetadataList = videoMetadataRepository.findByUserEmail(userEmail);
 
-		    if (videoMetadataList == null || videoMetadataList.isEmpty()) {
-		        throw new BusinessRuleException("No videos processed for the requested email.");
-		    }
+		if (videoMetadataList == null || videoMetadataList.isEmpty()) {
+			throw new BusinessRuleException("No videos processed for the requested email.");
+		}
 
-		    return videoMetadataList.stream()
-		    		  .map(VideoMetadataMapper::toDto)
-		            .collect(Collectors.toList());
-		
+		return videoMetadataList.stream().sorted(Comparator.comparing(VideoMetadata::getProcessedAt).reversed())
+				.map(VideoMetadataMapper::toDto).collect(Collectors.toList());
+
 	}
+
 	public void updateVideoStatus(String videoId, VideoStatusRequestDto dto) {
 		long startTime = System.currentTimeMillis();
 		LOGGER.info("############################################################");
@@ -73,8 +72,6 @@ public class VideoStatusUseCase {
 			videoMetadata.setResultObjectKey(dto.getResultObjectKey());
 			videoMetadata.setProcessedAt(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
 
-			
-
 			// 4. Se o status for "FAILED", envia notificacao
 
 			if (dto.getStatus() == ProcessingStatus.FAILED) {
@@ -82,11 +79,10 @@ public class VideoStatusUseCase {
 				videoMetadata.setNotificationSent(true);
 				LOGGER.info("#### NOTIFICATION SENT FOR VIDEO ID: {} ####", videoMetadata.getVideoId());
 			}
-			
+
 			// 3. Salva novamente no banco
 			amazonDynamoDBAdapter.save(videoMetadata);
 			LOGGER.info("#### VIDEOMETADATA SAVED IN DATABASE ####");
-			
 
 		} catch (Exception e) {
 			// Envia notificacao em caso de falha ao atualizar o status
@@ -94,8 +90,7 @@ public class VideoStatusUseCase {
 				sendFailureNotification(videoMetadata);
 			}
 			throw new BusinessRuleException("#### FAILED TO UPDATE VIDEO STATUS: ####" + e);
-		}
-		finally {
+		} finally {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
 			LOGGER.info("#### VIDEO UPDATE PROCESS ENDED ####");
@@ -103,7 +98,7 @@ public class VideoStatusUseCase {
 		}
 
 	}
-	
+
 	private void sendFailureNotification(VideoMetadata videoMetadata) {
 		// Ajustar esses parâmetros na instância do NotificationRequest
 		NotificationRequest notificationRequest = new NotificationRequest();
@@ -115,10 +110,10 @@ public class VideoStatusUseCase {
 			notificationHttpClient.sendNotification(notificationRequest);
 			LOGGER.info("#### DADOS DO VIDEO: {}, ENVIADO AO NOTIFICATION-MS ####", videoMetadata.getVideoId());
 		} catch (Exception e) {
-			LOGGER.error("#### ERRO AO ENVIAR DADOS DO VIDEO: {}, PARA O NOTIFICATION-MS ####", videoMetadata.getVideoId());
+			LOGGER.error("#### ERRO AO ENVIAR DADOS DO VIDEO: {}, PARA O NOTIFICATION-MS ####",
+					videoMetadata.getVideoId());
 			throw new RuntimeException("#### ERRO AO ENVIAR DADOS DO VIDEO ####", e);
 		}
 	}
-
 
 }

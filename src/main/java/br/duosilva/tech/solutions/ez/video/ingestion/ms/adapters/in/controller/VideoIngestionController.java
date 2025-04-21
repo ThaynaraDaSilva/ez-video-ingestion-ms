@@ -57,7 +57,7 @@ public class VideoIngestionController {
 	}
 	
 	@Operation(summary = "List videos")
-	@GetMapping(path = "/videos/get-video-status")
+	@GetMapping(path = "/videos/get-video-status", produces = "application/json")
 	public ResponseEntity<?> getVideoStatus(@RequestParam("user-email") String userEmail) {
 		List<VideoStatusResponseDto> response = videoStatusUseCase.listVideosByUserEmail(userEmail);
 	    return ResponseEntity.ok(response);
