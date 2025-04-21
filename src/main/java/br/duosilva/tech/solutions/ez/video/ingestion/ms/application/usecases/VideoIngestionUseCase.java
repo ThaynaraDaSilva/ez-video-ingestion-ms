@@ -57,8 +57,7 @@ public class VideoIngestionUseCase {
 	public void ingestVideo(MultipartFile[] multipartFiles, String userId, String userEmail) {
 
 		this.validateFilesPresence(multipartFiles);
-
-		videoUploadPolicyService.validateUserDailyUploadLimit(userId);
+		videoUploadPolicyService.validateMaxFilesPerRequest(multipartFiles);
 
 		for (MultipartFile file : multipartFiles) {
 			if (file.isEmpty())
@@ -81,6 +80,7 @@ public class VideoIngestionUseCase {
 		LOGGER.info("#### VIDEO UPLOAD PROCESS STARTED ####");
 
 		videoUploadPolicyService.validateFileSize(file);
+
 
 		try {
 

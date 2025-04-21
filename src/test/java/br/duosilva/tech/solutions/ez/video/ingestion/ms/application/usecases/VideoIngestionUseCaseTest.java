@@ -61,6 +61,7 @@ class VideoIngestionUseCaseTest {
     private VideoStatusUseCase videoStatusUseCase;
 
     private MultipartFile mockFile;
+    private MultipartFile[] mockFiles;
     private String userId = "user123";
     private String userEmail = "test@example.com";
 
@@ -135,9 +136,8 @@ class VideoIngestionUseCaseTest {
             mockedStatic.when(() -> S3KeyGenerator.generateS3Key(eq(userId), eq(mockFile), anyString())).thenReturn(s3Key);
 
             videoIngestionUseCase.ingestVideo(files, userId, userEmail);
-
-            verify(videoUploadPolicyService).validateUserDailyUploadLimit(userId);
-            verify(videoUploadPolicyService).validateFileSize(mockFile);
+            
+            verify(videoUploadPolicyService).validateMaxFilesPerRequest(mockFiles);
             verify(amazonS3Adapter).uploadFileToS3(s3Key, mockFile);
             verify(videoMetadataRepository).save(any(VideoMetadata.class));
             verify(amazonSQSAdapter).publishVideoIngestionMessage(any(VideoIngestionMessage.class));
