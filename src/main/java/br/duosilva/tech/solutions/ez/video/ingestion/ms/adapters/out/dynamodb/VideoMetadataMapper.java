@@ -20,6 +20,7 @@ public class VideoMetadataMapper {
         entity.setResultBucketName(domain.getResultBucketName());
         entity.setResultObjectKey(domain.getResultObjectKey());
         entity.setProcessedAt(domain.getProcessedAt());
+        entity.setNotificationSent(domain.isNotificationSent());
         return entity;
     }
 
