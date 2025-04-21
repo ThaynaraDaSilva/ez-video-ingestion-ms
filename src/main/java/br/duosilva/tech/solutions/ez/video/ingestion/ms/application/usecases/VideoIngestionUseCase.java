@@ -57,8 +57,7 @@ public class VideoIngestionUseCase {
 	public void ingestVideo(MultipartFile[] multipartFiles, String userId, String userEmail) {
 
 		this.validateFilesPresence(multipartFiles);
-
-		videoUploadPolicyService.validateUserDailyUploadLimit(userId);
+		videoUploadPolicyService.validateMaxFilesPerRequest(multipartFiles);
 
 		for (MultipartFile file : multipartFiles) {
 			if (file.isEmpty())
@@ -78,9 +77,10 @@ public class VideoIngestionUseCase {
 	private void ingestSingleVideoFile(MultipartFile file, String userId, String userEmail) {
 		long startTime = System.currentTimeMillis();
 		LOGGER.info("############################################################");
-		LOGGER.info("#### VIDEO UPLOAD PROCESS STARTED: {} ####", file.getOriginalFilename());
+		LOGGER.info("#### VIDEO UPLOAD PROCESS STARTED ####");
 
 		videoUploadPolicyService.validateFileSize(file);
+
 
 		try {
 
@@ -132,7 +132,7 @@ public class VideoIngestionUseCase {
 		} finally {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
-			LOGGER.info("#### VIDEO UPLOAD PROCESS COMPLETED: {} ####", file.getOriginalFilename());
+			LOGGER.info("#### VIDEO UPLOAD PROCESS COMPLETED ####");
 			LOGGER.info("#### TOTAL PROCESSING TIME: {} ####", DateTimeUtils.formatDuration(duration));
 		}
 	}

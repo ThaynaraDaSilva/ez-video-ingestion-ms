@@ -145,6 +145,12 @@ public class VideoMetadata {
 	public String getUserEmail() {
 		return userEmail;
 	}
+	
+	
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
 
 	public boolean isNotificationSent() {
 		return notificationSent;

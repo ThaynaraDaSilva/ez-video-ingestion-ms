@@ -10,15 +10,15 @@ public class VideoUploadPolicy {
      * Exemplo: 1000 = 1 frame por segundo
      */
     public long getFrameExtractionIntervalInMillis() {
-        return 1000; // 1 segundo
+        return 1000L; // 1 segundo
     }
 
 	public long getMaxFileSizeBytes() {
-		return 50 * 1024 * 1024;
+		return 50L * 1024 * 1024;
 	}
 
 	public long getMaxTotalRequestSizeBytes() {
-		return 100 * 1024 * 1024;
+		return 100L * 1024 * 1024;
 	}
 
 	public int getMaxFilesPerRequest() {
@@ -30,7 +30,7 @@ public class VideoUploadPolicy {
 	}
 
 	public long getMaxDailyTotalSizeBytes() {
-		return 300 * 1024 * 1024;
+		return 300L* 1024 * 1024;
 	}
 
 }
