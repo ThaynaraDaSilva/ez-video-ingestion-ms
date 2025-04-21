@@ -61,7 +61,6 @@ class VideoIngestionUseCaseTest {
     private VideoStatusUseCase videoStatusUseCase;
 
     private MultipartFile mockFile;
-    private MultipartFile[] mockFiles;
     private String userId = "user123";
     private String userEmail = "test@example.com";
 
@@ -137,7 +136,7 @@ class VideoIngestionUseCaseTest {
 
             videoIngestionUseCase.ingestVideo(files, userId, userEmail);
             
-            verify(videoUploadPolicyService).validateMaxFilesPerRequest(mockFiles);
+            verify(videoUploadPolicyService).validateMaxFilesPerRequest(any(MultipartFile[].class));
             verify(amazonS3Adapter).uploadFileToS3(s3Key, mockFile);
             verify(videoMetadataRepository).save(any(VideoMetadata.class));
             verify(amazonSQSAdapter).publishVideoIngestionMessage(any(VideoIngestionMessage.class));
@@ -152,17 +151,19 @@ class VideoIngestionUseCaseTest {
                 () -> videoIngestionUseCase.ingestVideo(files, userId, userEmail));
         assertEquals(ErrorMessages.NO_VIDEO_PROVIDED, exception.getMessage());
         verifyNoInteractions(videoUploadPolicyService, amazonS3Adapter, amazonSQSAdapter, videoMetadataRepository);
+        
     }
 
     @Test
     void testIngestVideo_EmptyFile_SkipsProcessing() {
         MultipartFile emptyFile = mock(MultipartFile.class);
         when(emptyFile.isEmpty()).thenReturn(true);
+        when(emptyFile.isEmpty()).thenReturn(true);
         MultipartFile[] files = { emptyFile };
 
         videoIngestionUseCase.ingestVideo(files, userId, userEmail);
 
-        verify(videoUploadPolicyService).validateUserDailyUploadLimit(userId);
+        verify(videoUploadPolicyService).validateMaxFilesPerRequest(any());
         verifyNoInteractions(amazonS3Adapter, amazonSQSAdapter, videoMetadataRepository);
     }
 
@@ -182,8 +183,7 @@ class VideoIngestionUseCaseTest {
             mockedStatic.when(() -> S3KeyGenerator.generateS3Key(eq(userId), eq(mockFile), anyString())).thenReturn(s3Key);
 
             videoIngestionUseCase.ingestVideo(files, userId, userEmail);
-
-            verify(videoUploadPolicyService).validateUserDailyUploadLimit(userId);
+            verify(videoUploadPolicyService).validateMaxFilesPerRequest(files);
             verify(videoUploadPolicyService).validateFileSize(mockFile);
             verify(amazonS3Adapter, never()).uploadFileToS3(anyString(), any(MultipartFile.class));
             verify(videoMetadataRepository).save(any(VideoMetadata.class));
@@ -191,29 +191,6 @@ class VideoIngestionUseCaseTest {
         }
     }
 
-	/*
-	 * @Test void testIngestVideo_UploadFails_ThrowsBusinessRuleException() {
-	 * MultipartFile[] files = { mockFile }; String s3Key =
-	 * "users/user123/videos/test_video.mp4";
-	 * 
-	 * when(mockFile.getOriginalFilename()).thenReturn("test_video.mp4");
-	 * when(mockFile.isEmpty()).thenReturn(false);
-	 * when(amazonS3Adapter.doesFileExistInS3(anyString())).thenReturn(false);
-	 * doThrow(new
-	 * RuntimeException("S3 upload failed")).when(amazonS3Adapter).uploadFileToS3(
-	 * anyString(), any(MultipartFile.class));
-	 * 
-	 * try (var mockedStatic = mockStatic(S3KeyGenerator.class)) {
-	 * mockedStatic.when(() -> S3KeyGenerator.generateS3Key(eq(userId),
-	 * eq(mockFile), anyString())).thenReturn(s3Key);
-	 * 
-	 * BusinessRuleException exception = assertThrows(BusinessRuleException.class,
-	 * () -> videoIngestionUseCase.ingestVideo(files, userId, userEmail));
-	 * assertTrue(exception.getMessage().contains("FAILED TO UPLOAD VIDEO"));
-	 * verify(videoMetadataRepository, never()).save(any(VideoMetadata.class));
-	 * verify(amazonSQSAdapter,
-	 * never()).publishVideoIngestionMessage(any(VideoIngestionMessage.class)); } }
-	 */
 
     @Test
     void testIngestVideo_MetadataSavedCorrectly() {
