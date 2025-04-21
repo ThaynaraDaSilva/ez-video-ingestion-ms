@@ -3,7 +3,9 @@ name: Video Ingestion MS CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - develop
+
+  workflow_dispatch: 
 
 env:
   SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
