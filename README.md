@@ -14,6 +14,23 @@ O `ez-video-ingestion-ms` também contem as funcionalidades para consultar o sta
 
 ---
 
+## 📊 Modelagem do Banco de Dados
+
+O `ez-video-ingestion-ms` utiliza o **DynamoDB** para armazenar metadados dos vídeos processados na tabela `video_metadata`. Estrutura da tabela:
+
+- **Nome da Tabela**: `video_metadata`
+- **Partition Key**: `videoId` (String, ex.: `vid123`)
+- **Possui atributos, tais como**:
+  - `originalFilename`: Nome do arquivo processado (String, ex.: `video_processed.mp4`)
+  - `status`: Status do processamento (String, ex.: `COMPLETED`, `FAILED`)
+  - `errorMessage`: Mensagem de erro, se aplicável (String, ex.: `Erro no processamento`)
+  - `processedAt`: Data/hora do processamento (String, ex.: `2025-04-19T10:10:00Z`)
+  - `resultObjectKey`: Guarda a presignedURL
+ 
+A criação do banco de banco dados ocorre via Terraform - [Infra](https://github.com/ThaynaraDaSilva/ez-frame-infrastructure)
+
+---
+
 ## 🛡️ Políticas de Upload de Vídeos
 
 O projeto foi estruturado com suporte à implementação de múltiplas **políticas configuráveis**, facilitando sua evolução para diferentes regras de negócio e, se necessário, a expansão para um serviço com diferentes planos e maior flexibilidade de regras. **Para esta entrega, definimos a implementação de apenas duas políticas**:
@@ -108,20 +125,6 @@ ez-video-ingestion-ms/
 ├── pom.xml                                     # Arquivo Maven com dependências
 └── README.md                                   # Documentação do projeto
 ```
-
----
-
-## 📊 Modelagem do Banco de Dados
-
-O `ez-video-ingestion-ms` utiliza o **DynamoDB** para armazenar metadados dos vídeos processados na tabela `video_metadata`. Estrutura da tabela:
-
-- **Nome da Tabela**: `video_metadata`
-- **Partition Key**: `videoId` (String, ex.: `vid123`)
-- **Atributos**:
-  - `filename`: Nome do arquivo processado (String, ex.: `video_processed.mp4`)
-  - `status`: Status do processamento (String, ex.: `COMPLETED`, `FAILED`)
-  - `errorMessage`: Mensagem de erro, se aplicável (String, ex.: `Erro no processamento`)
-  - `timestamp`: Data/hora do processamento (String, ex.: `2025-04-19T10:10:00Z`)
 
 ---
 
