@@ -67,7 +67,7 @@ O diagrama abaixo ilustra o fluxo do `ez-video-ingestion-ms` ***(em azul)*** e s
 
 ---
 
-## ✅ Pré-requisitos
+## ✅ Pré-requisitos para solução ez-frame (Todos os Microserviços)
 
 - ☕ **Java 21 instalado**
 - 📦 **Maven instalado**
