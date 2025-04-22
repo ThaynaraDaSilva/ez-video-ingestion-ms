@@ -69,8 +69,8 @@ O diagrama abaixo ilustra o fluxo do `ez-video-ingestion-ms` ***(em azul)*** e s
 
 ## ✅ Pré-requisitos para solução ez-frame (Todos os Microserviços)
 
-- ☕ **Java 21 instalado**
-- 📦 **Maven instalado**
+- ☕ **Java 21**
+- 📦 **Maven**
 - 🔐 **Credenciais AWS configuradas no repositório como GitHub Secrets**  
   - `AWS_ACCESS_KEY_ID`  
   - `AWS_SECRET_ACCESS_KEY`
