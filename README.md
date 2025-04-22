@@ -12,6 +12,17 @@ O microsserviço `ez-video-ingestion-ms` é o ponto de entrada para o upload e g
 
 ---
 
+## 🛡️ Políticas de Upload de Vídeos
+
+O projeto foi estruturado com suporte à aplicação de múltiplas **políticas configuráveis**, facilitando sua evolução para diferentes regras de negócio e, se necessário, a expansão para um serviço com diferentes planos e maior flexibilidade de regras. Para esta entrega, foram aplicadas apenas duas políticas:
+
+- `validateMaxFilesPerRequest`
+- `validateTotalSizePerRequest`
+
+Essas regras estão centralizadas na classe `VideoUploadPolicy` (pacote `br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.policy`), permitindo fácil manutenção e extensibilidade.
+
+---
+
 ## 🧱 Componentes da Solução Global ez-frame
 
 | **Componente** | **Finalidade** | **Justificativa** |
@@ -53,18 +64,6 @@ O diagrama abaixo ilustra o fluxo do `ez-video-ingestion-ms` (em azul) e suas in
 2. [Ingestion](https://github.com/ThaynaraDaSilva/ez-video-ingestion-ms)
 3. [Generator](https://github.com/ThaynaraDaSilva/ez-frame-generator-ms)
 4. [Notification](https://github.com/ThaynaraDaSilva/ez-frame-notification-ms)
-
----
-
-## 📏 Limites Definidos com Relação a Upload de Vídeos
-
-Com base na política de upload implementada (classe `VideoUploadPolicyService`):
-- **Tamanho Máximo por Arquivo**: 100 MB por vídeo  
-- **Limite Diário de Uploads por Usuário**: 10 vídeos por dia  
-- **Número Máximo de Arquivos por Requisição**: 3 vídeos por requisição  
-- **Tamanho Total por Requisição**: 300 MB no total por requisição  
-
-Esses limites garantem o uso eficiente dos recursos e evitam abusos no sistema.
 
 ---
 
