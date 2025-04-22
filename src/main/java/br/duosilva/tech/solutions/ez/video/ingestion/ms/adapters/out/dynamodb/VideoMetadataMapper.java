@@ -1,5 +1,6 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.adapters.out.dynamodb;
 
+import br.duosilva.tech.solutions.ez.video.ingestion.ms.application.dto.VideoStatusResponseDto;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.domain.model.VideoMetadata;
 import br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.persistence.VideoMetadataEntity;
 
@@ -20,6 +21,7 @@ public class VideoMetadataMapper {
         entity.setResultBucketName(domain.getResultBucketName());
         entity.setResultObjectKey(domain.getResultObjectKey());
         entity.setProcessedAt(domain.getProcessedAt());
+        entity.setNotificationSent(domain.isNotificationSent());
         return entity;
     }
 
@@ -37,6 +39,17 @@ public class VideoMetadataMapper {
             entity.getResultBucketName(),
             entity.getResultObjectKey(),
             entity.getProcessedAt()
+        );
+    }
+    
+    public static VideoStatusResponseDto toDto(VideoMetadata metadata) {
+        return new VideoStatusResponseDto(
+                metadata.getVideoId(),
+                metadata.getOriginalFileName(),
+                metadata.getProcessedAt(),
+                metadata.getResultObjectKey(),
+                metadata.getStatus(),
+                metadata.getUserEmail()
         );
     }
 }

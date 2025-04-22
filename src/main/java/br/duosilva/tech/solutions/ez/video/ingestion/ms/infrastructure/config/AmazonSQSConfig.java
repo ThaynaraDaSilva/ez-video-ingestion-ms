@@ -1,15 +1,11 @@
 package br.duosilva.tech.solutions.ez.video.ingestion.ms.infrastructure.config;
 
-import java.net.URI;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.SqsClientBuilder;
 
 @Configuration
 public class AmazonSQSConfig {
@@ -21,7 +17,7 @@ public class AmazonSQSConfig {
 	       
 	    }
 	    
-	    @Bean
+	   /* @Bean
 	    public SqsClient sqsClient() {
 	        SqsClientBuilder builder = SqsClient.builder()
 	            .region(Region.of(amazonProperties.getRegion()))
@@ -41,6 +37,14 @@ public class AmazonSQSConfig {
 	        }
 
 	        return builder.build();
+	    }*/
+	    
+	    @Bean
+	    public SqsClient sqsClient() {
+	        return SqsClient.builder()
+	                .region(Region.of(amazonProperties.getRegion()))
+	                .credentialsProvider(DefaultCredentialsProvider.create())
+	                .build();
 	    }
 
 }

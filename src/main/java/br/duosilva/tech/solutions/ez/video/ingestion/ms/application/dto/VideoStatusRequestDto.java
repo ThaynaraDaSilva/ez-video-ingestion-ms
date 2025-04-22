@@ -9,7 +9,7 @@ public class VideoStatusRequestDto {
 	private String resultObjectKey;
 
 	private String errorMessage;
-
+	
 	public VideoStatusRequestDto() {
 		super();
 	}
@@ -37,5 +37,6 @@ public class VideoStatusRequestDto {
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
+	
 
 }
