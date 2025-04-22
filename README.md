@@ -3,6 +3,7 @@
 ## 📌 Contextualização
 
 O microsserviço `ez-video-ingestion-ms` é o ponto de entrada para o upload e gerenciamento de vídeos na plataforma **ez-frame**. Ele é responsável por autenticar usuários via AWS Cognito e processar uploads de vídeos, enviando-os para o bucket S3 (`ez-frame-video-storage`). Além disso, salva metadados no DynamoDB (`video_metadata`), envia mensagens para a fila SQS (`video-processing-queue`) com dados do vídeo que precisa ser processado pelo `ez-frame-generator-ms`.
+
 O `ez-video-ingestion-ms` também contem as funcionalidades para consultar o status dos vídeos através do endpoint `http://host:8080/v1/ms/videos/get-video-status` e em caso de falhas, notifica o `ez-frame-notification-ms` via endpoint `http://host:8080/v1/ms/notification/send`.
 
 ---
