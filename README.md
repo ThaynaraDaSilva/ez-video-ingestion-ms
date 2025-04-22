@@ -1,66 +1,39 @@
-# 📥 Ingestion Service (`ez-frame-ingestion-ms`)
+# 📥 ez-video-ingestion-ms
 
 ## 📌 Contextualização
 
-O **Ingestion Service** é um microserviço da solução `ez-frame`, responsável por gerenciar o **upload de vídeos** por usuários autenticados.
-
-- Ele **salva vídeos** no Amazon S3 e **armazena metadados** no DynamoDB (tabela `Videos`).
-- **Enfileira tarefas** de processamento no Amazon SQS.
-- Oferece **endpoints** para consulta de status via Swagger.
-- **Atualiza o status** dos vídeos com base em chamadas do `Generator Service` e, se o status for `"FAILED"`, chama o `Notification Service` para enviar e-mails.
+O microsserviço `ez-video-ingestion-ms` é o ponto de entrada para o upload e gerenciamento de vídeos na plataforma **ez-frame**. Ele é responsável por autenticar usuários via AWS Cognito e processar uploads de vídeos, enviando-os para o bucket S3 (`ez-frame-video-storage`). Além disso, salva metadados no DynamoDB (`video_metadata`), envia mensagens para a fila SQS (`video-processing-queue`) para processamento assíncrono, e permite consultar o status dos vídeos através do endpoint `http://host:8080/v1/ms/videos/get-video-status`. Em caso de falhas, notifica o `ez-frame-notification-ms` via endpoint `http://host:8080/v1/ms/notification/send`.
 
 ---
 
 ## 🧩 Desenho de Arquitetura
 
-O diagrama abaixo representa o fluxo do `Ingestion Service` dentro da solução `ez-frame`, incluindo autenticação, upload, consulta de status, e notificação de falhas:
+![image](https://github.com/user-attachments/assets/da998aa9-deb2-48fc-9025-06d3e1dfb0d1)
 
-![image](https://github.com/user-attachments/assets/ce0767ec-63ca-4025-aa2e-f633623e44c8)
+---
 
-> Para visualizar o diagrama, cole o script abaixo in [PlantText](https://www.planttext.com/).
+## 🧱 Componentes da Solução Global ez-frame
 
-```
-@startuml
-!define RECTANGLE class
-!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+| **Componente** | **Finalidade** | **Justificativa** |
+| --- | --- | --- |
+| **Clean Architecture** | Organização interna da solução | Foi escolhida para garantir uma estrutura modular, de fácil manutenção e testes. Essa separação clara entre regras de negócio e infraestrutura facilita a escalabilidade da solução ao longo do tempo, conforme o sistema evolui. |
+| **Java 21** | Linguagem principal para implementação | A linguagem Java foi adotada em substituição ao .NET por uma decisão estratégica, considerando a expertise da equipe com o ecossistema Java. Essa escolha visa otimizar o desenvolvimento, reduzir a curva de aprendizado e garantir eficiência na evolução e manutenção da solução. |
+| **Apache Maven** | Gerenciamento de dependências e build | Ferramenta amplamente utilizada no ecossistema Java, facilita a organização do projeto, o versionamento de dependências e o processo de build e deploy. |
+| **Amazon EKS** | Orquestração dos microsserviços da solução | Solução gerenciada baseada em Kubernetes, que facilita o deploy, a escalabilidade e o gerenciamento dos microsserviços (`generator`, `ingestion`, `notification`), mantendo a consistência da infraestrutura. |
+| **Amazon SES** | Envio de e-mails de notificação em caso de erro | Atende ao requisito de notificação automática para o usuário em caso de falha no processamento. É um serviço simples, eficiente e com baixo custo, ideal para esse tipo de comunicação. |
+| **GitHub Actions** | Automatização de build, testes e deploys | O GitHub Actions foi escolhido por estar amplamente consolidado no mercado e por oferecer uma integração direta com repositórios GitHub, simplificando pipelines de entrega contínua. Além disso, a equipe já possui familiaridade com a ferramenta, o que reduz tempo de configuração e acelera o processo de entrega contínua. |
+| **Amazon Cognito**           | Autenticação e segurança no microsserviço de usuários                          | Solução gerenciada que facilita a implementação de autenticação com usuário e senha, atendendo ao requisito de proteger o sistema e controlando o acesso de forma segura e padronizada.                                                                                                               |
+| **Amazon SQS**               | Gerenciamento da fila de processamento de vídeos                               | Utilizamos SQS para garantir que os vídeos sejam processados de forma assíncrona e segura, sem perda de requisições, mesmo em momentos de pico. Isso também ajuda a escalar o sistema com segurança.                                                                                                   |
+| **DynamoDB**                 | Armazenamento dos metadados e arquivos gerados (como ZIPs de frames)           | Optamos pelo DynamoDB por ser altamente escalável e disponível, atendendo bem à necessidade de processar múltiplos vídeos em paralelo. Seu modelo NoSQL permite evoluir a estrutura dos dados sem migrações complexas, o que é útil caso futuramente a solução precise armazenar também os vídeos.     |
+| **Amazon S3** | Armazenamento de vídeos e arquivos ZIP gerados | O S3 foi adotado por ser um serviço de armazenamento de objetos altamente durável, escalável e econômico, perfeito para armazenar vídeos enviados pelos usuários e arquivos ZIP gerados pelo `ez-frame-generator-ms` (bucket `ez-frame-video-storage`). Permite o compartilhamento seguro dos arquivos gerados via presigned URLs e suporta vídeos grandes e múltiplos uploads com facilidade. |
 
-Person(client, "Cliente", "Usuário que envia vídeos")
-Container(cognito, "Cognito", "Autenticação de usuários")
-Container(apiGateway, "API Gateway", "Valida tokens e expõe endpoints")
-Container(ingestionService, "Ingestion Service", "Spring Boot (Java 21)", "Recebe vídeos, enfileira tarefas e atualiza status")
-Container(sqs, "SQS", "Fila de tarefas")
-Container(generatorService, "Generator Service", "Spring Boot (Java 21)", "Processa vídeos")
-Container(notificationService, "Notification Service", "Spring Boot (Java 21)", "Envia e-mails")
-Container(dynamodb, "DynamoDB", "Armazena metadados")
-Container(videosTable, "Videos", "Tabela", "Metadados de vídeos")
-Container(s3, "S3", "Armazena vídeos")
-Container(ses, "SES", "Envia e-mails")
+---
 
-' Relacionamentos
-dynamodb --> videosTable
-client --> ingestionService : "1. Acessa endpoint de upload"
-ingestionService --> cognito : "2. Redireciona para login"
-cognito --> client : "3. Usuário faz login"
-cognito --> apiGateway : "4. Envia dados de login para autenticação"
-apiGateway --> ingestionService : "5. Redireciona com permissões"
-ingestionService --> s3 : "6. Salva vídeo"
-ingestionService --> videosTable : "7. Salva metadados (Videos)"
-ingestionService --> sqs : "8. Enfileira tarefa"
-generatorService --> ingestionService : "9. Atualiza status (POST /update-status)"
-ingestionService --> notificationService : "10. Chama endpoint (falhas, HTTP)"
-notificationService --> ses : "11. Envia e-mail (falha)"
-ingestionService --> videosTable : "12. Atualiza status (Videos)"
-client --> ingestionService : "13. Consulta status via Swagger"
-ingestionService --> videosTable : "14. Consulta metadados (Videos)"
-ingestionService --> client : "15. Retorna status do vídeo"
+## 🧩 Fluxo de Interação entre Serviços
 
-' Estilização
-skinparam monochrome true
-skinparam shadowing false
-skinparam backgroundColor #FFFFFF
+O diagrama abaixo ilustra o fluxo do `ez-video-ingestion-ms` (em azul) e suas interações com outros componentes do sistema.
 
-@enduml
-```
+![image](https://github.com/user-attachments/assets/8081bc86-2c7a-4041-affb-ba3841e22d92)
 
 ---
 
@@ -70,7 +43,16 @@ skinparam backgroundColor #FFFFFF
 - 📦 Maven instalado  
 - 🔐 Credenciais AWS configuradas (`AWS CLI` ou arquivo `~/.aws/credentials`)  
 - 🌐 Acesso a serviços AWS (S3, SQS, DynamoDB, Cognito) com permissões adequadas  
-- 📧 Endereço de e-mail verificado no Cognito para autenticação (ex.: `seu-email@dominio.com`)
+
+---
+
+## ✅ Requisito para execução da solução
+
+### 🚀 Criar ambiente e realizar deploy na seguinte ordem:
+1. [Infra](https://github.com/ThaynaraDaSilva/ez-frame-infrastructure)
+2. [Ingestion](https://github.com/ThaynaraDaSilva/ez-video-ingestion-ms)
+3. [Generator](https://github.com/ThaynaraDaSilva/ez-frame-generator-ms)
+4. [Notification](https://github.com/ThaynaraDaSilva/ez-frame-notification-ms)
 
 ---
 
@@ -79,7 +61,7 @@ skinparam backgroundColor #FFFFFF
 Com base na política de upload implementada (classe `VideoUploadPolicyService`):
 - **Tamanho Máximo por Arquivo**: 100 MB por vídeo  
 - **Limite Diário de Uploads por Usuário**: 10 vídeos por dia  
-- **Número Máximo de Arquivos por Requisição**: 5 vídeos por requisição  
+- **Número Máximo de Arquivos por Requisição**: 3 vídeos por requisição  
 - **Tamanho Total por Requisição**: 300 MB no total por requisição  
 
 Esses limites garantem o uso eficiente dos recursos e evitam abusos no sistema.
@@ -91,22 +73,24 @@ Esses limites garantem o uso eficiente dos recursos e evitam abusos no sistema.
 A estrutura segue o padrão **Clean Architecture**:
 
 ```
-ez-frame-ingestion-ms/
+ez-video-ingestion-ms/
 ├── src/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── br/duosilva/tech/solutions/ez/frame/ingestion/ms/
 │   │   │       ├── adapters/
 │   │   │       │   ├── in/
-│   │   │       │   │   └── controller/       # Controladores REST (ex.: VideoIngestionController)
+│   │   │       │   │   └── controller/       # Controladores REST (upload, status)
 │   │   │       │   └── out/
-│   │   │       │       └── repository/       # Repositórios (ex.: VideoMetadataRepository)
+│   │   │       │       ├── storage/         # Integração com S3
+│   │   │       │       ├── queue/           # Integração com SQS
+│   │   │       │       └── database/        # Integração com DynamoDB
 │   │   │       ├── application/
-│   │   │       │   ├── dto/                 # DTOs (ex.: VideoStatusResponse)
-│   │   │       │   └── usecases/            # Casos de uso (ex.: ListVideoStatusUseCase)
+│   │   │       │   ├── dto/                 # DTOs
+│   │   │       │   └── usecases/            # Casos de uso
 │   │   │       ├── domain/
-│   │   │       │   └── model/               # Modelos de domínio (ex.: VideoMetadata)
-│   │   │       └── config/                  # Configurações (ex.: SecurityConfig)
+│   │   │       │   └── model/               # Modelos de domínio
+│   │   │       └── config/                  # Configurações
 │   │   └── resources/
 │   │       └── application.yml              # Configurações do Spring Boot
 ├── pom.xml                                     # Arquivo Maven com dependências
@@ -117,135 +101,29 @@ ez-frame-ingestion-ms/
 
 ## 📊 Modelagem do Banco de Dados
 
-O `Ingestion Service` utiliza o **DynamoDB** para armazenar metadados dos vídeos na tabela `Videos`. Estrutura da tabela:
+O `ez-video-ingestion-ms` utiliza o **DynamoDB** para armazenar metadados dos vídeos processados na tabela `video_metadata`. Estrutura da tabela:
 
-- **Nome da Tabela**: `Videos`  
-- **Partition Key**: `videoId` (String, ex.: `vid123`)  
-- **Atributos**:  
-  - `filename`: Nome do arquivo (String, ex.: `video.mp4`)  
-  - `email`: E-mail do usuário que fez o upload (String, ex.: `seu-email@dominio.com`)  
-  - `status`: Status do vídeo (String, ex.: `UPLOADED`, `PROCESSING`, `COMPLETED`, `FAILED`)  
-  - `errorMessage`: Mensagem de erro, se aplicável (String, ex.: `Erro no processamento`)  
-  - `timestamp`: Data/hora do upload (String, ex.: `2025-04-19T10:00:00Z`)  
-- **Índice Secundário Global (GSI)**:  
-  - Nome: `EmailIndex`  
-  - Partition Key: `email`  
-  - Sort Key: `timestamp` (para ordenar vídeos por data de upload)
+- **Nome da Tabela**: `video_metadata`
+- **Partition Key**: `videoId` (String, ex.: `vid123`)
+- **Atributos**:
+  - `filename`: Nome do arquivo processado (String, ex.: `video_processed.mp4`)
+  - `status`: Status do processamento (String, ex.: `COMPLETED`, `FAILED`)
+  - `errorMessage`: Mensagem de erro, se aplicável (String, ex.: `Erro no processamento`)
+  - `timestamp`: Data/hora do processamento (String, ex.: `2025-04-19T10:10:00Z`)
 
 ---
 
-## 🛠️ Como Compilar o Projeto
+## 🎥 Vídeos de apresentação
 
-### 1️⃣ Clone o repositório
+[📐 Desenho de Arquitetura](https://youtu.be/ry-GS9WqmaU)
 
-```bash
-git clone https://github.com/ThaynaraDaSilva/ez-frame-ingestion-ms.git
-cd ez-frame-ingestion-ms
-```
+[🔧 Github Rulesets, Pipelines e Sonarqube](https://youtu.be/jqO4ldizBwY)
 
-### 2️⃣ Configure o arquivo `application.yml`
+[🔐 Jornada de Login e Upload de Vídeo](https://youtu.be/sk-AvQ9TnIw)
 
-```yaml
-aws:
-  region: us-east-1
-  s3:
-    bucket: <NOME_DO_BUCKET>
-  sqs:
-    queue-url: <URL_DA_FILA_SQS>
-  dynamodb:
-    table-name: Videos
-notification-service:
-  url: http://notification-service:8080/send
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-```
+[📧 Jornada de Envio de Notificação](https://youtu.be/mE9PhuUo4Co)
 
-### 3️⃣ Compile e execute o projeto
-
-```bash
-mvn clean install
-mvn spring-boot:run
-```
-
----
-
-📡 Teste os Endpoints HTTP
-
-```http
-POST /upload
-```
-📤 Exemplo de Payload
-
-```json
-{
-  "filename": "video.mp4",
-  "email": "seu-email@dominio.com"
-}
-```
-🧪 Teste com cURL
-
-```bash
-curl -X POST http://localhost:8080/upload \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <SEU_TOKEN_JWT>" \
-  -d '{"filename":"video.mp4","email":"seu-email@dominio.com"}'
-```
-
-```http
-GET /videos/status
-```
-🧪 Teste com cURL
-
-```bash
-curl -X GET http://localhost:8080/videos/status \
-  -H "Authorization: Bearer <SEU_TOKEN_JWT>"
-```
-
-```http
-POST /update-status
-```
-📤 Exemplo de Payload
-
-```json
-{
-  "videoId": "123",
-  "status": "FAILED",
-  "errorMessage": "Erro no processamento"
-}
-```
-🧪 Teste com cURL
-
-```bash
-curl -X POST http://localhost:8080/update-status \
-  -H "Content-Type: application/json" \
-  -d '{"videoId":"123","status":"FAILED","errorMessage":"Erro no processamento"}'
-```
-
-Ou utilize ferramentas como **Swagger UI** (`http://localhost:8080/swagger-ui.html`).
-
----
-
-## 🧱 Componentes da Solução Global ez-frame
-
-| **Componente**               | **Finalidade**                                                                 | **Justificativa**                                                                                                                                                                                                                                                                                      |
-|------------------------------|--------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Clean Architecture**       | Organização interna da solução                                                 | Foi escolhida para garantir uma estrutura modular, de fácil manutenção e testes. Essa separação clara entre regras de negócio e infraestrutura facilita a escalabilidade da solução ao longo do tempo, conforme o sistema evolui.                                                                     |
-| **Java 21**                  | Linguagem principal para implementação                                          | A linguagem Java foi adotada em substituição ao .NET por uma decisão estratégica, considerando a expertise da equipe com o ecossistema Java. Essa escolha visa otimizar o desenvolvimento, reduzir a curva de aprendizado e garantir eficiência na evolução e manutenção da solução.                   |
-| **DynamoDB**                 | Armazenamento dos metadados dos vídeos                                         | Optamos pelo DynamoDB por ser altamente escalável e disponível, atendendo bem à necessidade de processar múltiplos vídeos em paralelo. Seu modelo NoSQL permite evoluir a estrutura dos dados sem migrações complexas, o que é útil caso futuramente a solução precise armazenar também os vídeos.     |
-| **Apache Maven**             | Gerenciamento de dependências e build                                          | Ferramenta amplamente utilizada no ecossistema Java, facilita a organização do projeto, o versionamento de dependências e o processo de build e deploy.                                                                                                                                                |
-| **Amazon Cognito**           | Autenticação e segurança no microsserviço                                      | Solução gerenciada que facilita a implementação de autenticação com usuário e senha, atendendo ao requisito de proteger o sistema e controlando o acesso de forma segura e padronizada.                                                                                                               |
-| **Amazon SQS**               | Gerenciamento da fila de processamento de vídeos                               | Utilizamos SQS para garantir que os vídeos sejam processados de forma assíncrona e segura, sem perda de requisições, mesmo em momentos de pico. Isso também ajuda a escalar o sistema com segurança.                                                                                                   |
-| **Amazon EKS**               | Orquestração dos microsserviços da solução                                     | Solução gerenciada baseada em Kubernetes, que facilita o deploy, a escalabilidade e o gerenciamento dos microsserviços (`generator`, `ingestion`, `notification`), mantendo a consistência da infraestrutura.                                                                                         |
-| **GitHub Actions**           | Automatização de build, testes e deploys                                       | O GitHub Actions foi escolhido por estar amplamente consolidado no mercado e por oferecer uma integração direta com repositórios GitHub, simplificando pipelines de entrega contínua. Além disso, a equipe já possui familiaridade com a ferramenta, o que reduz tempo de configuração e acelera o processo de entrega contínua. |
-
----
-
-## 🔗 Demais Projetos Relacionados
-
-**ez-frame-generator-ms** — Microserviço que escuta a fila SQS para processar vídeos e atualiza o status no `Ingestion Service`.  
-
-**ez-frame-notification-ms** — Microserviço que envia notificações por e-mail em caso de falha no processamento, chamado pelo `Ingestion Service`.
+[🖼️ Jornada de Geração de Frames](https://youtu.be/bfRUG1w-S8w)
 
 ---
 
