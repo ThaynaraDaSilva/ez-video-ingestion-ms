@@ -76,11 +76,15 @@ O diagrama abaixo ilustra o fluxo do `ez-video-ingestion-ms` ***(em azul)*** e s
   - `AWS_SECRET_ACCESS_KEY`
 - 🔐 **Credenciais do SonarQube configuradas no repositório como GitHub Secrets**  
   - `SONAR_TOKEN`
+  - `PROJECT_KEY`
+- 🔐 **Credenciais do Dockerhub configuradas no repositório como GitHub Secrets**  
+  - `DOCKER_PASSWORD`
+  - `DOCKER_USERNAME`
 - 👤 **Criar UserPool e AppClient no Amazon Cognito**
-- 📧 **Criar entity (e-mail verificado) no Amazon SES**
-- 📄 Configurar as filas:
+- 📄 **Configurar as filas**:
   - `video-processing-queue`
   - `video-processing-queue-dlq`
+- 📧 **Criar Entity (e-mail verificado) no Amazon SES**
 - 🛡️ **Criar usuário IAM com política SES para envio de e-mails**  
   - Permissões necessárias: `ses:SendEmail` e `ses:SendRawEmail`
   - Exemplo de **policy JSON** para colar na criação da política no IAM:
