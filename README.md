@@ -85,6 +85,22 @@ O diagrama abaixo ilustra o fluxo do `ez-video-ingestion-ms` ***(em azul)*** e s
   - `video-processing-queue`
   - `video-processing-queue-dlq`
 
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ses:SendEmail",
+                "ses:SendRawEmail"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
 ---
 
 ## ✅ Requisito para execução da solução
