@@ -78,12 +78,12 @@ O diagrama abaixo ilustra o fluxo do `ez-video-ingestion-ms` ***(em azul)*** e s
   - `SONAR_TOKEN`
 - 👤 **Criar UserPool e AppClient no Amazon Cognito**
 - 📧 **Criar entity (e-mail verificado) no Amazon SES**
-- 🛡️ **Criar usuário IAM com política SES para envio de e-mails**  
-  - Permissões necessárias: `ses:SendEmail` e `ses:SendRawEmail`
-  - Exemplo de **policy JSON** para colar na criação da política no IAM:
 - 📄 Configurar as filas:
   - `video-processing-queue`
   - `video-processing-queue-dlq`
+- 🛡️ **Criar usuário IAM com política SES para envio de e-mails**  
+  - Permissões necessárias: `ses:SendEmail` e `ses:SendRawEmail`
+  - Exemplo de **policy JSON** para colar na criação da política no IAM:
 
 ```json
 {
