@@ -34,12 +34,12 @@ public class VideoUploadPolicyService {
 
 	public void validateMaxFilesPerRequest(MultipartFile[] files) {
 		int nonEmptyFiles = (int) Arrays.stream(files).filter(file -> !file.isEmpty()).count();
-
-		this.validateTotalSizePerRequest(files);
 		
 		if (nonEmptyFiles > uploadPolicy.getMaxFilesPerRequest()) {
 			throw new BusinessRuleException(ErrorMessages.MAX_FILES_PER_REQUEST_EXCEEDED);
 		}
+		
+		this.validateTotalSizePerRequest(files);
 	}
 
 	public void validateTotalSizePerRequest(MultipartFile[] files) {
